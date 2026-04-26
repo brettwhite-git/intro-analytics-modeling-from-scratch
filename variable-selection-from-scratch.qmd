@@ -1,0 +1,192 @@
+---
+title: "Variable Selection: Choosing What Your Model Gets to See"
+subtitle: "LASSO, ridge, stepwise methods, and the bias-variance tradeoff"
+engine: knitr
+---
+
+## The Problem: Too Many Variables
+
+Every model we've built so far uses **factors** (predictor variables) to make predictions. But how many factors should a model actually use? There are two compelling reasons to prefer fewer:
+
+**1. Overfitting risk.** When the number of factors approaches the number of data points, the model starts fitting *random* patterns in addition to *real* ones. With only 3 data points and 1 factor, different samples produce wildly different regression lines. With enough factors relative to data, even meaningless ones (like the temperature 37 days after someone's birth) appear to have predictive power.
+
+**2. Simplicity and explainability.** Fewer factors means:
+
+- Less data collection cost
+- Easier explanation to non-technical stakeholders
+- Less chance of including a non-significant factor (20 factors at $p = 0.05$ gives a 64% chance at least one is meaningless)
+- **Legal compliance**: In credit decisions, factors like race, sex, religion, and marital status are forbidden. Overly complex models can use these indirectly through correlated proxies (zip code $\rightarrow$ race, "lives in Utah" $\rightarrow$ religion)
+
+> **Key insight:** If you can't clearly communicate what your model is doing, it won't be trusted or used — and in some industries, it would be illegal to use.
+
+---
+
+## Greedy Methods: Step by Step
+
+These methods make locally optimal decisions at each step without considering future consequences.
+
+### Forward Selection
+Start with **no factors**. At each step, add the single best factor (lowest p-value or highest $R^2$ improvement) if it's "good enough" (e.g., $p < 0.10$ to $0.15$). Stop when no remaining factor meets the threshold. Optionally remove weak factors at the end.
+
+### Backward Elimination
+Start with **all factors**. At each step, remove the worst factor until nothing is "bad enough" to remove (e.g., all remaining factors have $p < 0.05$).
+
+### Stepwise Regression
+**Combines both**: after adding each new factor, immediately check if any existing factors should now be removed. This allows the model to adjust as new factors change the picture. Most commonly used of the three.
+
+All three can use **p-values, $R^2$, AIC, or BIC** as the selection criterion.
+
+> **Limitation:** Greedy methods tend to overfit random effects and often don't perform as well on new data compared to global methods.
+
+---
+
+## LASSO: Budget Allocation
+
+LASSO (Least Absolute Shrinkage and Selection Operator) takes a fundamentally different approach. Instead of stepping through factors one at a time, it adds a **constraint** to the regression optimization:
+
+$$\sum_{j=1}^{p} |a_j| \leq T$$
+
+The sum of the absolute values of all coefficients must be within a "budget" $T$. The model allocates this budget to the most important coefficients, driving the rest **exactly to zero** — effectively removing those variables.
+
+**Critical requirement:** LASSO requires **scaled data** because the constraint operates on coefficient magnitudes, and unscaled data means units affect which coefficients appear larger.
+
+The right value of $T$ is found by trying different values and comparing model quality (using cross-validation from the validation walkthrough).
+
+---
+
+## Ridge Regression: Shrink, Don't Remove
+
+Ridge regression uses a similar constraint, but on **squared** coefficient values:
+
+$$\sum_{j=1}^{p} a_j^2 \leq T$$
+
+This **shrinks all coefficients toward zero** without eliminating any. It's a form of **regularization** — reducing overfitting by constraining coefficient magnitudes rather than removing variables.
+
+**When to use ridge:** When your linear regression model appears overfit (validation error much worse than training error) but you don't want to remove variables entirely.
+
+---
+
+## The Geometric Intuition: Why LASSO Removes Variables and Ridge Doesn't
+
+This is the core visual insight of the module. In 2D (two coefficients):
+
+```{r}
+#| label: fig-lasso-vs-ridge
+#| fig-cap: "LASSO constraint (diamond) vs. Ridge constraint (circle). The error ellipses tend to touch the diamond at corners (where coefficients = 0) but touch the circle at non-corner points (all coefficients nonzero)."
+#| fig-width: 8
+#| fig-height: 4
+#| echo: false
+
+par(mfrow = c(1, 2), mar = c(4, 4, 3, 1))
+
+# --- LASSO (diamond) ---
+plot(NULL, xlim = c(-2.5, 2.5), ylim = c(-2.5, 2.5), asp = 1,
+     xlab = expression(a[1]), ylab = expression(a[2]),
+     main = "LASSO Constraint (Diamond)")
+abline(h = 0, v = 0, col = "gray85", lty = 2)
+
+# Diamond constraint region
+T_val <- 1.2
+polygon(c(T_val, 0, -T_val, 0), c(0, T_val, 0, -T_val),
+        col = rgb(0.18, 0.42, 0.31, 0.15), border = "#2d6a4f", lwd = 2)
+
+# Error ellipses (centered away from origin)
+theta <- seq(0, 2 * pi, length.out = 200)
+cx <- 1.8; cy <- 0.6
+for (r in c(0.5, 0.9, 1.3)) {
+  ex <- cx + r * cos(theta)
+  ey <- cy + r * 0.6 * sin(theta)
+  lines(ex, ey, col = "#d62828", lty = 3)
+}
+points(cx, cy, pch = 4, col = "#d62828", cex = 1.2, lwd = 2)
+
+# Mark the corner where ellipse touches diamond
+points(T_val, 0, pch = 19, col = "#2d6a4f", cex = 1.5)
+text(T_val + 0.15, -0.3, expression(a[2] == 0), col = "#2d6a4f", cex = 0.9, adj = 0)
+
+legend("bottomleft", legend = c("Constraint region", "Error contours", "Solution (corner)"),
+       col = c("#2d6a4f", "#d62828", "#2d6a4f"), lty = c(1, 3, NA),
+       pch = c(NA, NA, 19), lwd = c(2, 1, NA), cex = 0.8, bg = "white")
+
+# --- Ridge (circle) ---
+plot(NULL, xlim = c(-2.5, 2.5), ylim = c(-2.5, 2.5), asp = 1,
+     xlab = expression(a[1]), ylab = expression(a[2]),
+     main = "Ridge Constraint (Circle)")
+abline(h = 0, v = 0, col = "gray85", lty = 2)
+
+# Circle constraint region
+R_val <- 1.2
+cx_circ <- R_val * cos(theta)
+cy_circ <- R_val * sin(theta)
+polygon(cx_circ, cy_circ,
+        col = rgb(0.18, 0.42, 0.31, 0.15), border = "#2d6a4f", lwd = 2)
+
+# Error ellipses
+for (r in c(0.5, 0.9, 1.15)) {
+  ex <- cx + r * cos(theta)
+  ey <- cy + r * 0.6 * sin(theta)
+  lines(ex, ey, col = "#d62828", lty = 3)
+}
+points(cx, cy, pch = 4, col = "#d62828", cex = 1.2, lwd = 2)
+
+# Mark the tangent point (NOT on an axis)
+angle_touch <- atan2(cy, cx)
+px <- R_val * cos(angle_touch)
+py <- R_val * sin(angle_touch)
+points(px, py, pch = 19, col = "#2d6a4f", cex = 1.5)
+text(px + 0.15, py - 0.25, "Both nonzero", col = "#2d6a4f", cex = 0.9, adj = 0)
+
+legend("bottomleft", legend = c("Constraint region", "Error contours", "Solution (non-corner)"),
+       col = c("#2d6a4f", "#d62828", "#2d6a4f"), lty = c(1, 3, NA),
+       pch = c(NA, NA, 19), lwd = c(2, 1, NA), cex = 0.8, bg = "white")
+```
+
+**The key insight:** The diamond has **straight edges** that create corners on the axes (where coefficients = 0). The expanding error ellipses almost always hit a corner first. The circle has a **curved boundary** — curved ellipses touching a curved surface almost never land on an axis. That's the entire geometric explanation.
+
+---
+
+## Bias-Variance Tradeoff
+
+Every dataset contains **real patterns** (true effects) and **random patterns** (noise artifacts). Models can't tell them apart — they can only fit more or less to *all* patterns simultaneously.
+
+| | Fits random patterns (high) | Avoids random patterns (low) |
+|---|---|---|
+| **Captures real patterns (high)** | Overfitting danger | **Sweet spot** |
+| **Misses real patterns (low)** | Worst case | Underfitting |
+
+- **Bias** = error from missing real patterns (underfitting). Removing variables and shrinking coefficients increases bias.
+- **Variance** = error from fitting random patterns (overfitting). More variables and larger coefficients increase variance.
+
+The sweet spot minimizes **total prediction error** (bias + variance). Validation helps you find it, and domain experts can guide which patterns are likely real.
+
+> **Practitioner note:** He dislikes the terms "bias" and "variance" in this context — finds them confusing. The intuition (real vs. random patterns) matters more than the jargon.
+
+---
+
+## Choosing a Method
+
+| Method | Speed | Variable Selection? | Regularization? | Best For |
+|--------|-------|-------------------|-----------------|----------|
+| Forward/Backward/Stepwise | Fast | Yes | No | Initial exploration |
+| LASSO | Slower | Yes (zeros out coefficients) | Yes | Final predictive models |
+| Ridge | Slower | No (shrinks only) | Yes | Reducing overfitting without removing variables |
+| Elastic Net | Slower | Yes + shrinkage | Yes | Correlated predictors |
+
+**Elastic net** combines LASSO (absolute value constraint) with ridge (quadratic constraint). With correlated factors, LASSO arbitrarily picks one; ridge includes both but may underestimate. Elastic net offers a middle ground.
+
+> **Practical emphasis:** "There's a lot of art to analytics" — if you have time to try one method, you have time to try several and compare.
+
+---
+
+## Common Pitfalls
+
+::: {.callout-warning}
+### Common Misconceptions
+
+1. **Ridge regression does NOT do variable selection** — it shrinks coefficients but never drives them exactly to zero.
+2. **LASSO requires scaled data** — because the absolute-value constraint is sensitive to coefficient magnitudes.
+3. **Greedy methods can miss the best model** — they make locally optimal choices that may not be globally optimal.
+4. **Elastic net is not "LASSO but better"** — it's a tradeoff. With uncorrelated factors, LASSO alone may be cleaner.
+5. **A tighter budget $T$ in LASSO = more variables removed** — not fewer. Smaller $T$ forces more coefficients to zero.
+6. **Bias-variance is about prediction on NEW data** — training error alone doesn't reveal the tradeoff.
+:::

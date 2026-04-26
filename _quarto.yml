@@ -1,0 +1,78 @@
+project:
+  type: website
+  output-dir: _site
+  render:
+    - "*.qmd"
+
+website:
+  title: "Analytics Modeling From Scratch"
+  description: "Step-by-step analytics modeling walkthroughs for learners who want the formulas, code, and intuition together."
+  search: true
+  sidebar:
+    style: docked
+    contents:
+      - text: "Home"
+        icon: house-door
+        href: index.qmd
+      - section: "Classification"
+        contents:
+          - svm-from-scratch.qmd
+          - knn-from-scratch.qmd
+      - section: "Validation"
+        contents:
+          - cross-validation-from-scratch.qmd
+      - section: "Clustering"
+        contents:
+          - kmeans-from-scratch.qmd
+      - section: "Change Detection"
+        contents:
+          - cusum-from-scratch.qmd
+      - section: "Time Series"
+        contents:
+          - time-series-from-scratch.qmd
+      - section: "Regression"
+        contents:
+          - regression-from-scratch.qmd
+      - section: "Transformations"
+        contents:
+          - pca-boxcox-from-scratch.qmd
+      - section: "Trees"
+        contents:
+          - cart-from-scratch.qmd
+      - section: "Practice"
+        contents:
+          - comprehensive-quiz.qmd
+          - binary-choice-drill.qmd
+          - confusion-matrix-drill.qmd
+      - section: "Variable Selection"
+        contents:
+          - variable-selection-from-scratch.qmd
+      - section: "Design of Experiments"
+        contents:
+          - doe-from-scratch.qmd
+      - section: "Simulation & Markov"
+        contents:
+          - simulation-markov-from-scratch.qmd
+      - section: "Missing Data"
+        contents:
+          - missing-data-from-scratch.qmd
+      - section: "Optimization"
+        contents:
+          - optimization-from-scratch.qmd
+      - section: "Advanced Topics"
+        contents:
+          - advanced-topics-from-scratch.qmd
+  page-footer:
+    center: "Independent educational resource. Content is CC BY-NC 4.0; code is MIT licensed."
+
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    code-fold: false
+    theme: cosmo
+    css: styles.css
+    grid:
+      body-width: 900px
+      sidebar-width: 350px
+      margin-width: 350px

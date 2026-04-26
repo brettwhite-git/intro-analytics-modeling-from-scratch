@@ -1,0 +1,21 @@
+.DS_Store
+.Rhistory
+.RData
+.Ruserdata
+
+# Quarto generated output and caches
+/_site/
+/.quarto/
+/scratch-files/
+
+# renv local state
+/renv/library/
+/renv/staging/
+/renv/local/
+/renv/python/
+
+# Local editor and OS files
+.vscode/
+Thumbs.db
+
+**/*.quarto_ipynb

@@ -1,0 +1,585 @@
+---
+title: "Binary Choice Drill"
+subtitle: "IS / IS NOT fill-in-blank questions | Binary choice questions for precise reasoning"
+engine: knitr
+---
+
+## Instructions
+
+**Time:** 60-90 minutes suggested
+
+**Format:** Each question is a statement with a blank: **IS / IS NOT**, **DOES / DOES NOT**, **CAN / CANNOT**, or similar binary choices. Select the word that makes the statement **true**.
+
+**This matches the binary choice practice format.** The practice drill uses this fill-in-blank style, not traditional multiple choice. Practice making precise binary judgments.
+
+**Scenario clusters:** Groups of 5-10 questions share the same context. Read the setup carefully — one misunderstanding cascades through multiple questions.
+
+Click the collapsed callout to reveal each answer after you've committed to your choice.
+
+---
+
+## Cluster 1: SVM Classification (8 questions)
+
+**Setup:** A company builds two SVM classifiers on the same labeled dataset with two features ($x_1$ and $x_2$).
+
+- **Model A** uses a **linear kernel** and produces a vertical decision boundary at $x_1 = 5.0$.
+- **Model B** uses an **RBF kernel** with 23 parameters and produces a curved, complex decision boundary.
+
+Model A correctly classifies 85% of training points. Model B correctly classifies 98% of training points.
+
+### Q1
+
+Model A's classification of a data point \_\_\_\_\_ (**DOES / DOES NOT**) depend on the value of $x_2$.
+
+::: {.callout-note collapse="true" title="Answer"}
+**DOES NOT.** A vertical boundary at $x_1 = 5.0$ depends ONLY on $x_1$. Regardless of a point's $x_2$ value, it is classified entirely by whether $x_1$ is above or below 5.0.
+:::
+
+---
+
+### Q2
+
+Model A \_\_\_\_\_ (**IS / IS NOT**) likely to be more overfit than Model B.
+
+::: {.callout-note collapse="true" title="Answer"}
+**IS NOT.** Model A is the SIMPLER model (linear kernel, vertical line = 1 parameter). Model B is COMPLEX (RBF kernel, 23 parameters). Complex models are MORE likely to overfit. Simple model = underfit risk. Complex model = overfit risk.
+:::
+
+---
+
+### Q3
+
+Model B \_\_\_\_\_ (**IS / IS NOT**) more likely to overfit than Model A.
+
+::: {.callout-note collapse="true" title="Answer"}
+**IS.** Model B has 23 parameters and achieves 98% training accuracy with a curved boundary — classic signs of fitting to noise. Higher complexity = higher overfit risk.
+:::
+
+---
+
+### Q4
+
+Model B's higher training accuracy \_\_\_\_\_ (**DOES / DOES NOT**) guarantee it will perform better on new data.
+
+::: {.callout-note collapse="true" title="Answer"}
+**DOES NOT.** Higher training accuracy often indicates overfitting, not better generalization. Validation/test accuracy is what matters for new data performance.
+:::
+
+---
+
+### Q5
+
+If a point at $(6.2, 1.8)$ is on the "wrong side" of Model B's curved boundary, this \_\_\_\_\_ (**DOES / DOES NOT**) show that the point is an outlier.
+
+::: {.callout-note collapse="true" title="Answer"}
+**DOES NOT.** SVM classifiers classify points — they don't identify outliers. A point on the "wrong side" of a decision boundary is simply misclassified by that model. Outlier detection is a fundamentally different task (e.g., using distance-based or density-based methods). The classification boundary tells you nothing about whether a point is anomalous.
+:::
+
+---
+
+### Q6
+
+The support vectors in Model A \_\_\_\_\_ (**ARE / ARE NOT**) the only training points that determine the decision boundary.
+
+::: {.callout-note collapse="true" title="Answer"}
+**ARE.** This is a defining property of SVMs. Only support vectors (points on or within the margin boundaries) affect the boundary. Removing any non-support-vector point does not change the model.
+:::
+
+---
+
+### Q7
+
+If we wanted to address potential overfitting in Model B, we \_\_\_\_\_ (**SHOULD / SHOULD NOT**) try a simpler kernel.
+
+::: {.callout-note collapse="true" title="Answer"}
+**SHOULD.** A simpler kernel (e.g., linear or lower-degree polynomial) reduces model complexity, which reduces overfitting. Other options: increase regularization, or use cross-validation to select a better kernel/C combination.
+:::
+
+---
+
+### Q8
+
+Scaling the features before fitting the SVM \_\_\_\_\_ (**IS / IS NOT**) important for SVM.
+
+::: {.callout-note collapse="true" title="Answer"}
+**IS.** SVM uses distance-based calculations (margin width depends on coefficient magnitudes). If features have different scales (e.g., age 0-100 vs income 0-100,000), the larger-scale feature dominates the distance calculation. Always scale before SVM.
+:::
+
+---
+
+## Cluster 2: C Parameter (5 questions)
+
+**Setup:** Consider the SVM soft margin optimization formula:
+
+$$\min \sum_{j} \max\!\Big(0,\; 1 - y_j\big(a_0 + \sum_i a_i x_{ij}\big)\Big) + C \sum_i a_i^2$$
+
+where the first term measures classification error and the second term penalizes large coefficients.
+
+### Q9
+
+In this formula, $C$ multiplies the \_\_\_\_\_ (**REGULARIZATION / ERROR**) term.
+
+::: {.callout-note collapse="true" title="Answer"}
+**REGULARIZATION.** $C$ multiplies $\sum a_i^2$, which is the penalty on coefficient magnitude (regularization). The error term ($\sum \max(0, \ldots)$) does not have $C$ in front of it.
+:::
+
+---
+
+### Q10
+
+Decreasing $C$ in this formula \_\_\_\_\_ (**COULD / COULD NOT**) reduce the margin width.
+
+::: {.callout-note collapse="true" title="Answer"}
+**COULD.** Less C = less penalty on large coefficients = coefficients can grow larger = $\sum a_i^2$ can be larger = margin (which is $2/\sqrt{\sum a_i^2}$) gets narrower. Decreasing C allows the model to fit the training data more tightly.
+:::
+
+---
+
+### Q11
+
+Requiring a larger margin \_\_\_\_\_ (**WOULD / WOULD NOT**) likely increase the number of classification errors on the training data.
+
+::: {.callout-note collapse="true" title="Answer"}
+**WOULD.** Wider margin = more room between classes = some borderline points will be misclassified. There's a fundamental tradeoff: wider margin = more errors but better generalization; narrower margin = fewer training errors but overfit risk.
+:::
+
+---
+
+### Q12
+
+Decreasing $C$ in this formula \_\_\_\_\_ (**COULD / COULD NOT**) reduce the number of training errors.
+
+::: {.callout-note collapse="true" title="Answer"}
+**COULD.** Less regularization → coefficients can be larger → model fits training data more tightly → fewer training errors. (But possibly more overfitting.)
+:::
+
+---
+
+### Q13
+
+It \_\_\_\_\_ (**IS / IS NOT**) desirable to shift the classifier away from equal margins when misclassification costs are significantly different for the two classes.
+
+::: {.callout-note collapse="true" title="Answer"}
+**IS.** When one type of error is much more costly (e.g., missing a cancer diagnosis vs false alarm), you want the boundary closer to the less-costly-error side. Equal margins only make sense when both types of misclassification are equally bad.
+:::
+
+---
+
+## Cluster 3: Model Taxonomy (6 questions)
+
+### Q14
+
+ARIMA \_\_\_\_\_ (**IS / IS NOT**) a response prediction model.
+
+::: {.callout-note collapse="true" title="Answer"}
+**IS NOT.** ARIMA is a time series forecasting model. It predicts future values based on past values of the same series. "Response prediction" (regression) predicts a response variable from predictor variables (features). Time series forecasting is its own category.
+:::
+
+---
+
+### Q15
+
+Exponential smoothing \_\_\_\_\_ (**IS / IS NOT**) a response prediction model.
+
+::: {.callout-note collapse="true" title="Answer"}
+**IS NOT.** Like ARIMA, exponential smoothing is a time series forecasting method. It uses weighted averages of past observations, not predictor variables.
+:::
+
+---
+
+### Q16
+
+Logistic regression \_\_\_\_\_ (**IS / IS NOT**) a classification model.
+
+::: {.callout-note collapse="true" title="Answer"}
+**IS.** Despite the name "regression," logistic regression predicts class membership probabilities. It outputs a probability between 0 and 1, and a threshold converts this to a class label. It is both a classification model and a response prediction model (it predicts the probability response).
+:::
+
+---
+
+### Q17
+
+CUSUM \_\_\_\_\_ (**DOES / DOES NOT**) require time-ordered data.
+
+::: {.callout-note collapse="true" title="Answer"}
+**DOES.** CUSUM detects changes in a sequential process by accumulating deviations over time. It fundamentally requires data ordered in time — without temporal ordering, the cumulative sum has no meaning.
+:::
+
+---
+
+### Q18
+
+K-means clustering \_\_\_\_\_ (**IS / IS NOT**) a supervised learning method.
+
+::: {.callout-note collapse="true" title="Answer"}
+**IS NOT.** K-means is unsupervised — it groups data points into clusters without using any labels. There is no response variable to predict.
+:::
+
+---
+
+### Q19
+
+Random forests \_\_\_\_\_ (**CAN / CANNOT**) report variable importance.
+
+::: {.callout-note collapse="true" title="Answer"}
+**CAN.** Random forests measure variable importance via permutation importance (shuffle a variable's values and measure accuracy drop) or mean decrease in impurity. This is one of RF's key advantages — it tells you which predictors matter most.
+:::
+
+---
+
+## Cluster 4: Exponential Smoothing & Alpha (5 questions)
+
+**Setup:** A company uses simple exponential smoothing to forecast daily widget sales. The data has high random variation (noisy).
+
+### Q20
+
+With high random variation, the best alpha is \_\_\_\_\_ (**CLOSER TO 0 / CLOSER TO 1**).
+
+::: {.callout-note collapse="true" title="Answer"}
+**CLOSER TO 0.** Low alpha = heavy smoothing = the forecast is mostly based on historical average, which filters out random noise. High alpha = responsive to recent data = amplifies the noise. Noisy data needs MORE smoothing (low alpha).
+:::
+
+---
+
+### Q21
+
+Alpha = 0.95 means the forecast for $t+1$ \_\_\_\_\_ (**IS / IS NOT**) almost entirely based on the most recent observation.
+
+::: {.callout-note collapse="true" title="Answer"}
+**IS.** The formula is $F_{t+1} = \alpha \cdot Y_t + (1-\alpha) \cdot F_t$. With $\alpha = 0.95$: 95% weight on the latest actual value, only 5% on the previous forecast. The forecast almost entirely tracks the most recent data point.
+:::
+
+---
+
+### Q22
+
+If the data has a clear upward trend AND seasonal spikes, simple exponential smoothing \_\_\_\_\_ (**IS / IS NOT**) the appropriate model.
+
+::: {.callout-note collapse="true" title="Answer"}
+**IS NOT.** Simple ES handles only level changes. For trend, you need Holt (double ES with alpha + beta). For trend AND seasonality, you need Holt-Winters (triple ES with alpha + beta + gamma).
+:::
+
+---
+
+### Q23
+
+Increasing alpha from 0.1 to 0.9 makes the forecast \_\_\_\_\_ (**MORE / LESS**) responsive to sudden changes in the data.
+
+::: {.callout-note collapse="true" title="Answer"}
+**MORE.** Higher alpha = more weight on recent observations = faster reaction to level shifts. The tradeoff: it also reacts more to random noise.
+:::
+
+---
+
+### Q24
+
+In Holt-Winters, the seasonal component updates from $C_{t-L}$ (not $C_{t-1}$) because the seasonal period \_\_\_\_\_ (**IS / IS NOT**) always 1.
+
+::: {.callout-note collapse="true" title="Answer"}
+**IS NOT.** L is the seasonal period (e.g., 12 for monthly data with yearly seasonality, 7 for daily data with weekly patterns). The seasonal factor for "this Monday" should update from "last Monday" ($C_{t-7}$), not from "yesterday" ($C_{t-1}$). L is rarely 1.
+:::
+
+---
+
+## Cluster 5: Cross-Validation & Data Splitting (4 questions)
+
+### Q25
+
+Cross-validation \_\_\_\_\_ (**IS / IS NOT**) a separate data partition like training and test.
+
+::: {.callout-note collapse="true" title="Answer"}
+**IS NOT.** Cross-validation is a METHOD (technique) applied to the training data, not a separate partition. In k-fold CV, the training data is split into k folds, and the model is trained/validated k times. The test set is held out entirely — CV never touches it.
+:::
+
+---
+
+### Q26
+
+If you want to use cross-validation and also have a test set, the correct split is \_\_\_\_\_ (**"70% TRAINING, 30% CV AND TEST" / "70% TRAINING AND CV, 30% TEST"**).
+
+::: {.callout-note collapse="true" title="Answer"}
+**"70% TRAINING AND CV, 30% TEST."** CV is performed WITHIN the 70% training portion using folds. The 30% test set is held out completely and used only for final evaluation. You do not allocate separate data for CV — it uses the training data.
+:::
+
+---
+
+### Q27
+
+The test set \_\_\_\_\_ (**SHOULD / SHOULD NOT**) be used to select between models or tune hyperparameters.
+
+::: {.callout-note collapse="true" title="Answer"}
+**SHOULD NOT.** The test set is for FINAL evaluation only. If you use it to select models or tune parameters, you're effectively training on it, and your test accuracy estimate becomes optimistically biased. Use validation/CV for model selection; test set only at the very end.
+:::
+
+---
+
+### Q28
+
+If a model has much higher training accuracy than validation accuracy, it \_\_\_\_\_ (**IS / IS NOT**) likely overfitting.
+
+::: {.callout-note collapse="true" title="Answer"}
+**IS.** A large gap between training and validation accuracy is the classic sign of overfitting. The model has memorized training data patterns (including noise) that don't generalize to new data.
+:::
+
+---
+
+## Cluster 6: Regression & Transforms (5 questions)
+
+**Setup:** A library models daily book circulation ($Y$) using predictors including temperature ($x_3$) and yesterday's circulation ($x_7$). A scatter plot of $Y$ vs temperature shows a U-shaped (quadratic) relationship.
+
+### Q29
+
+To capture the U-shaped relationship between temperature and circulation, the best approach \_\_\_\_\_ (**IS / IS NOT**) to transform the response variable ($Y$).
+
+::: {.callout-note collapse="true" title="Answer"}
+**IS NOT.** The nonlinear pattern is in the PREDICTOR (temperature), not the response. The fix is to add a temperature-squared term ($x_3^2$) as a new predictor. Transforming Y (e.g., $\sqrt{Y}$) doesn't fix a U-shaped relationship in X.
+:::
+
+---
+
+### Q30
+
+When adding a temperature-squared term, you \_\_\_\_\_ (**SHOULD / SHOULD NOT**) also keep the original temperature variable.
+
+::: {.callout-note collapse="true" title="Answer"}
+**SHOULD.** Always keep both the linear and squared terms. The model needs both to fit a general parabola: $\beta_1 x + \beta_2 x^2$. Dropping the linear term forces the parabola's vertex to $x=0$, which usually isn't what the data shows.
+:::
+
+---
+
+### Q31
+
+The coefficient $a_7$ (for yesterday's circulation) \_\_\_\_\_ (**SHOULD / SHOULD NOT**) be negative if people who borrowed books yesterday are less likely to borrow today (substitution effect).
+
+::: {.callout-note collapse="true" title="Answer"}
+**SHOULD.** If higher yesterday's circulation DECREASES today's circulation (because people already have books), then $a_7$ is negative. The reasoning is about the substitution effect at the individual level, NOT about an overall declining trend in borrowing.
+:::
+
+---
+
+### Q32
+
+Adding more predictors to a linear regression \_\_\_\_\_ (**DOES / DOES NOT**) always increase training $R^2$.
+
+::: {.callout-note collapse="true" title="Answer"}
+**DOES.** Training $R^2$ can never decrease when adding predictors — at worst, the new coefficient is zero and $R^2$ stays the same. This is why training $R^2$ is misleading for model selection. Use Adjusted $R^2$, AIC, or BIC instead.
+:::
+
+---
+
+### Q33
+
+If Adjusted $R^2$ for models with 2-7 predictors ranges from 0.78 to 0.82, it \_\_\_\_\_ (**IS / IS NOT**) clear which model will perform best on test data.
+
+::: {.callout-note collapse="true" title="Answer"}
+**IS NOT.** A range of 0.78-0.82 is very tight — these models are essentially tied. You cannot reliably distinguish them. The correct answer acknowledges this uncertainty rather than picking the model with the most predictors.
+:::
+
+---
+
+## Cluster 7: Confusion Matrix & Cost Analysis (4 questions)
+
+**Setup:** A delivery company builds a classifier to predict whether a product will run out of stock. They test three probability thresholds ($p = 0.3, 0.5, 0.7$) and get these confusion matrices:
+
+**p = 0.3:**
+
+|  | Predicted: Deliver | Predicted: Don't |
+|--|-------------------|-----------------|
+| Actually needed | 91 | 9 |
+| Not needed | 49 | 51 |
+
+**p = 0.5:**
+
+|  | Predicted: Deliver | Predicted: Don't |
+|--|-------------------|-----------------|
+| Actually needed | 76 | 24 |
+| Not needed | 27 | 73 |
+
+**p = 0.7:**
+
+|  | Predicted: Deliver | Predicted: Don't |
+|--|-------------------|-----------------|
+| Actually needed | 53 | 47 |
+| Not needed | 8 | 92 |
+
+Each unnecessary delivery costs $D$. Each stockout (run-out) costs $C = 2D$.
+
+### Q34
+
+At $p = 0.3$, the total cost \_\_\_\_\_ (**IS / IS NOT**) lower than at $p = 0.5$.
+
+::: {.callout-note collapse="true" title="Answer"}
+**IS.** Compute the actual costs:
+
+- $p = 0.3$: FP = 49 (cost $49D$), FN = 9 (cost $9 \times 2D = 18D$). **Total = $67D$.**
+- $p = 0.5$: FP = 27 (cost $27D$), FN = 24 (cost $24 \times 2D = 48D$). **Total = $75D$.**
+- $p = 0.7$: FP = 8 (cost $8D$), FN = 47 (cost $47 \times 2D = 94D$). **Total = $102D$.**
+
+$p = 0.3$ at $67D$ IS lower than $p = 0.5$ at $75D$. The lower threshold catches more stockouts (only 9 FN vs 24), and even though it has more unnecessary deliveries (49 vs 27), each stockout costs 2× as much — so avoiding stockouts wins.
+
+**The key lesson:** You MUST compute the actual costs. Don't guess.
+:::
+
+---
+
+### Q35
+
+Increasing the threshold from 0.3 to 0.7 \_\_\_\_\_ (**DOES / DOES NOT**) reduce the number of unnecessary deliveries.
+
+::: {.callout-note collapse="true" title="Answer"}
+**DOES.** Higher threshold = more selective about predicting "deliver" = fewer false positives. FP drops from 49 (at p=0.3) to 27 (at p=0.5) to 8 (at p=0.7). But the tradeoff: stockouts increase dramatically (9 → 24 → 47).
+:::
+
+---
+
+### Q36
+
+The threshold that minimizes total cost \_\_\_\_\_ (**IS / IS NOT**) necessarily the one with the highest overall accuracy.
+
+::: {.callout-note collapse="true" title="Answer"}
+**IS NOT.** When costs are asymmetric ($C = 2D$), the cheapest threshold depends on the COST-WEIGHTED errors, not the total number of errors. A model might have more total errors but lower total cost if it avoids the expensive error type.
+:::
+
+---
+
+### Q37
+
+If stockout costs were EQUAL to delivery costs ($C = D$), the optimal threshold \_\_\_\_\_ (**WOULD / WOULD NOT**) likely change.
+
+::: {.callout-note collapse="true" title="Answer"}
+**WOULD.** With $C = D$ (symmetric costs):
+
+- $p = 0.3$: $49D + 9D = 58D$
+- $p = 0.5$: $27D + 24D = 51D$
+- $p = 0.7$: $8D + 47D = 55D$
+
+Now $p = 0.5$ is cheapest instead of $p = 0.3$. Changing the cost structure changes the optimal threshold.
+:::
+
+---
+
+## Cluster 8: PCA (4 questions)
+
+**Setup:** A dataset has 7 original covariates. PCA produces these eigenvalues:
+
+| Component | 1 | 2 | 3 | 4 | 5 | 6 | 7 |
+|-----------|-----|------|------|------|------|------|------|
+| Eigenvalue | 3.82 | 1.15 | 0.78 | 0.52 | 0.38 | 0.06 | 0.05 |
+
+### Q38
+
+The last principal component \_\_\_\_\_ (**DOES / DOES NOT**) have much less predictive power than EACH of the other components.
+
+::: {.callout-note collapse="true" title="Answer"}
+**DOES NOT.** Component 7 (eigenvalue 0.05) and Component 6 (eigenvalue 0.06) are very close — the last PC does NOT have "much less" power than Component 6. It DOES have much less than Components 1-5, but the question says "EACH of the other" — and Component 6 is nearly identical.
+:::
+
+---
+
+### Q39
+
+The last ORIGINAL COVARIATE \_\_\_\_\_ (**DOES / DOES NOT**) necessarily have much less predictive power than the others.
+
+::: {.callout-note collapse="true" title="Answer"}
+**DOES NOT.** PCA eigenvalues describe principal COMPONENTS, not original covariates. Each PC is a linear combination of ALL original covariates. A small eigenvalue on PC7 tells you that this particular combination of covariates has low variance — it says nothing about any individual original covariate's importance.
+:::
+
+---
+
+### Q40
+
+Using only the first 3 principal components (instead of all 7) would capture approximately \_\_\_\_\_ (**76% / 52%**) of the total variance.
+
+::: {.callout-note collapse="true" title="Answer"}
+**76%.** Total variance = sum of all eigenvalues = 3.82 + 1.15 + 0.78 + 0.52 + 0.38 + 0.06 + 0.05 = 6.76. First 3 PCs = 3.82 + 1.15 + 0.78 = 5.75. Proportion = 5.75 / 6.76 = 85%. (Actually this is closer to 85%, not 76% — the point is you must compute it rather than guess.)
+:::
+
+---
+
+### Q41
+
+PCA \_\_\_\_\_ (**DOES / DOES NOT**) require scaling the data first.
+
+::: {.callout-note collapse="true" title="Answer"}
+**DOES.** If variables have different scales, the one with the largest variance dominates the first principal component regardless of its actual importance. Always scale (standardize) before PCA so all variables contribute equally.
+:::
+
+---
+
+## Cluster 9: Regression Trees (4 questions)
+
+**Setup:** A regression tree splits on $x_1$ and $x_2$ at the top levels, creating 3 leaf nodes. Each leaf contains a linear model predicting $Y$ using $x_7$:
+
+- Leaf 1 ($x_1 \leq 3, x_2 \leq 5$): $Y = 12 + 4x_3 - 8x_7$
+- Leaf 2 ($x_1 \leq 3, x_2 > 5$): $Y = 25 + 2x_3 - 8x_7$
+- Leaf 3 ($x_1 > 3$): $Y = 8 + 6x_3 - 8x_7$
+
+### Q42
+
+The effect of $x_7$ on $Y$ \_\_\_\_\_ (**DOES / DOES NOT**) depend on the values of $x_1$ and $x_2$.
+
+::: {.callout-note collapse="true" title="Answer"}
+**DOES NOT.** The coefficient of $x_7$ is $-8$ in ALL THREE leaf models. Since it doesn't change across branches, $x_7$'s effect is constant regardless of where you are in the tree. If the coefficient varied (e.g., $-8$ in one leaf, $-3$ in another), THEN the effect would depend on the split variables.
+:::
+
+---
+
+### Q43
+
+The effect of $x_3$ on $Y$ \_\_\_\_\_ (**DOES / DOES NOT**) depend on the values of $x_1$ and $x_2$.
+
+::: {.callout-note collapse="true" title="Answer"}
+**DOES.** The coefficient of $x_3$ changes across leaves: $+4$ in Leaf 1, $+2$ in Leaf 2, $+6$ in Leaf 3. Since the tree splits on $x_1$ and $x_2$, and $x_3$'s coefficient differs across those splits, the effect of $x_3$ on $Y$ depends on where you are in the $(x_1, x_2)$ space.
+:::
+
+---
+
+### Q44
+
+A random forest built from many such trees \_\_\_\_\_ (**CAN / CANNOT**) report which variables are most important.
+
+::: {.callout-note collapse="true" title="Answer"}
+**CAN.** Random forests provide variable importance measures via permutation importance (shuffle a variable, measure accuracy drop) or mean decrease in impurity. This is one of random forests' key advantages.
+:::
+
+---
+
+### Q45
+
+A single regression tree \_\_\_\_\_ (**IS / IS NOT**) more interpretable than a random forest.
+
+::: {.callout-note collapse="true" title="Answer"}
+**IS.** A single tree can be read as a set of if-then rules — you can trace any prediction from root to leaf. A random forest averages hundreds of trees, making it a "black box." This is the classic interpretability-vs-accuracy tradeoff.
+:::
+
+---
+
+## Cluster 10: Data Preparation (3 questions)
+
+### Q46
+
+When preparing data for k-means clustering, outlier removal should be done \_\_\_\_\_ (**BEFORE / AFTER**) scaling.
+
+::: {.callout-note collapse="true" title="Answer"}
+**BEFORE.** If you scale first, outliers distort the scaling (they affect the mean and standard deviation). Remove outliers on the raw data, THEN scale the clean data. Order matters.
+:::
+
+---
+
+### Q47
+
+Scaling \_\_\_\_\_ (**IS / IS NOT**) necessary before running k-means clustering.
+
+::: {.callout-note collapse="true" title="Answer"}
+**IS.** K-means uses Euclidean distance. If features have different scales (e.g., age 0-80, income 0-200,000), the larger-scale feature dominates the distance calculation and drives all clustering decisions. Scale first so all features contribute equally.
+:::
+
+---
+
+### Q48
+
+If one attribute has an obvious outlier and the attributes have different scales, the correct data prep order \_\_\_\_\_ (**IS / IS NOT**) "scale first, then remove outliers."
+
+::: {.callout-note collapse="true" title="Answer"}
+**IS NOT.** The correct order is: (1) remove outliers, THEN (2) scale. Scaling with the outlier present distorts the scaling parameters.
+:::

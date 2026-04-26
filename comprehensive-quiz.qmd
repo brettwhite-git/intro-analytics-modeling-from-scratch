@@ -1,0 +1,1079 @@
+---
+title: "Comprehensive Quiz"
+subtitle: "Multiple-choice checks and explain-it-back prompts across core analytics topics"
+---
+
+## Instructions
+
+**Time:** 90-120 minutes suggested
+
+**Two question types:**
+
+1. **Multiple-choice (MC):** Choose the best answer. Some are "select all that apply."
+2. **Feynman (F):** Explain the concept as if teaching someone unfamiliar. Write your answer on paper or out loud, *then* click the hint and model answer to compare.
+
+**Answer reveals:** Click the collapsed callout below each question to see the answer. For Feynman questions, try the **Hint** first before checking the **Model Answer**.
+
+## Feynman Scoring Rubric
+
+Rate each of your Feynman explanations:
+
+| Level | Score | Criteria |
+|-------|-------|----------|
+| **Incomplete** | 0 | Cannot explain the concept, or explanation has fundamental errors |
+| **Surface** | 1 | Correct but uses jargon without unpacking it, or skips the "why" |
+| **Feynman** | 2 | A non-expert could follow your explanation. Uses concrete examples. Addresses WHY, not just WHAT. No hand-waving. |
+
+**Targets:** 80%+ on MC questions AND average Feynman score $\geq$ 1.5
+
+---
+
+## 1. Classification Foundations
+
+### Q1. SVM --- Support Vectors
+
+In a trained SVM classifier, you remove a data point that is NOT a support vector. What happens to the decision boundary?
+
+- [ ] (a) The boundary shifts toward the removed point
+- [ ] (b) The boundary shifts away from the removed point
+- [ ] (c) The boundary does not change
+- [ ] (d) The model must be retrained from scratch to determine the effect
+
+::: {.callout-note collapse="true" title="Answer & Explanation"}
+**(c) The boundary does not change.** Only support vectors determine the decision boundary. All other points are irrelevant to the solution. This is a key property of SVMs --- the boundary depends on a small subset of data, making it robust to non-boundary points.
+:::
+
+---
+
+### Q2. SVM --- Kernel Choice
+
+Your data has two classes arranged in concentric circles (one class forms a ring around the other). Which kernel is most appropriate?
+
+- [ ] (a) Linear kernel
+- [ ] (b) Polynomial kernel (degree 1)
+- [ ] (c) RBF (Gaussian) kernel
+- [ ] (d) No SVM kernel can separate this data
+
+::: {.callout-note collapse="true" title="Answer & Explanation"}
+**(c) RBF kernel.** Concentric circles are not linearly separable in the original 2D space. The RBF kernel maps points into a higher-dimensional space where a linear separator exists. A polynomial kernel of degree 1 is just a linear kernel. Higher-degree polynomials might work for some configurations, but RBF is the standard choice for radially symmetric boundaries.
+:::
+
+---
+
+### Q3. KNN --- Curse of Dimensionality
+
+You have a KNN model with 1,000 training points and 2 features that achieves 88% validation accuracy. You add 50 more features (total: 52) without adding more data. What is the most likely outcome?
+
+- [ ] (a) Accuracy improves because more features provide more information
+- [ ] (b) Accuracy drops because distances become meaningless in high dimensions
+- [ ] (c) Accuracy stays the same because KNN adapts to any dimensionality
+- [ ] (d) Accuracy improves only if you decrease k
+
+::: {.callout-note collapse="true" title="Answer & Explanation"}
+**(b) Accuracy drops.** This is the **curse of dimensionality**. In high-dimensional space, all points become roughly equidistant from each other. With 52 features and only 1,000 points, the space is extremely sparse --- "nearest" neighbors are no longer meaningfully near. KNN relies on meaningful distances, so it degrades severely in high dimensions without proportionally more data.
+:::
+
+---
+
+### Q4. Classification --- Misclassification Costs
+
+A hospital builds a classifier to screen blood donations for a rare disease. Which error is more costly?
+
+- [ ] (a) False positive (flagging clean blood as contaminated)
+- [ ] (b) False negative (passing contaminated blood as clean)
+- [ ] (c) Both errors are equally costly
+- [ ] (d) It depends on the prevalence of the disease
+
+::: {.callout-note collapse="true" title="Answer & Explanation"}
+**(b) False negative.** Passing contaminated blood to a patient could be fatal. A false positive wastes a blood unit and requires retesting --- inconvenient and costly, but not life-threatening. This is a classic **asymmetric misclassification cost** scenario. The classifier should be tuned to minimize false negatives even at the expense of more false positives.
+:::
+
+---
+
+### F1. Explain: Why Must You Scale Features Before Using SVM or KNN?
+
+A colleague says "I have income ($20K-$200K) and number of children (0-6) as features. Why can't I just use them as-is?" Explain why scaling is mandatory and what happens without it.
+
+*Write your explanation, then check below.*
+
+::: {.callout-tip collapse="true" title="Hint"}
+Think about what "distance" means when one feature is measured in tens of thousands and another in single digits. Which feature dominates the distance calculation?
+:::
+
+::: {.callout-note collapse="true" title="Model Answer"}
+Both SVM and KNN use distance between points to make decisions. Distance is calculated using something like the Euclidean formula: $\sqrt{(x_1 - x_2)^2 + (y_1 - y_2)^2}$.
+
+If income ranges from 20,000 to 200,000 and children ranges from 0 to 6, the income differences are on the order of 100,000 while children differences are at most 6. When you square these and add them, income contributes roughly $10^{10}$ while children contributes at most 36. The children feature is effectively invisible.
+
+The model would make decisions based almost entirely on income, even if number of children is a strong predictor. Scaling (e.g., standardizing to mean 0 and standard deviation 1) puts both features on equal footing so the algorithm can learn which features actually matter.
+
+This applies to SVM, KNN, k-means, and PCA --- any method that uses distances or magnitudes.
+:::
+
+---
+
+### F2. Explain: What Are Support Vectors and Why Do They Matter?
+
+Explain to someone who has never taken a statistics class what "support vectors" are and why the SVM only cares about them.
+
+::: {.callout-tip collapse="true" title="Hint"}
+Think of the decision boundary as a fence between two groups. Which data points determine where the fence goes?
+:::
+
+::: {.callout-note collapse="true" title="Model Answer"}
+Imagine you have red dots and blue dots on a table and you want to draw a line separating them. You could draw many possible lines, but SVM picks the line that maximizes the gap (margin) between the two groups.
+
+The **support vectors** are the few points sitting right at the edge of this gap --- the closest red points to the blue side and the closest blue points to the red side. They "support" the boundary like tent poles holding up a tent.
+
+Why do only these matter? Because if you moved or removed any point that is far from the boundary, nothing would change --- the gap is still determined by those edge points. But move a support vector and the entire boundary shifts. This means:
+
+1. SVM is efficient --- it only needs to track a small number of critical points
+2. SVM is robust --- it ignores noise far from the boundary
+3. Adding more data far from the boundary doesn't change the model
+:::
+
+---
+
+### F3. Explain: KNN vs. SVM --- When Would You Choose Each?
+
+A friend asks "Both SVM and KNN do classification. When would you pick one over the other?" Give concrete scenarios.
+
+::: {.callout-tip collapse="true" title="Hint"}
+Think about: dataset size, number of features, whether you need to explain the model, and what the decision boundary shape might look like.
+:::
+
+::: {.callout-note collapse="true" title="Model Answer"}
+**Choose KNN when:**
+
+- You have a small dataset and want a quick, simple model
+- The decision boundary is irregular (KNN adapts to any shape naturally)
+- You don't mind slow predictions (KNN stores all data and computes distances at prediction time --- "lazy learner")
+
+**Choose SVM when:**
+
+- You have many features (SVM handles high dimensions better than KNN)
+- You want a fast model at prediction time (SVM only uses support vectors)
+- The classes have a clear margin of separation
+- You can afford more training time (fitting the optimization problem)
+
+**Neither is universally better.** KNN is simpler to understand and implement but scales poorly with data size and dimensionality. SVM is more computationally expensive to train but produces a compact model. Both require feature scaling.
+:::
+
+---
+
+## 2. Validation & Clustering
+
+### Q5. Cross-Validation --- Data Leakage
+
+You scale all your features to mean 0 and standard deviation 1 using the entire dataset, then perform 10-fold cross-validation. What is wrong with this approach?
+
+- [ ] (a) Nothing --- scaling before CV is standard practice
+- [ ] (b) The validation folds have seen information from the test data, inflating accuracy
+- [ ] (c) The validation folds have seen information from themselves, inflating accuracy
+- [ ] (d) You should use 5-fold instead of 10-fold
+
+::: {.callout-note collapse="true" title="Answer & Explanation"}
+**(b) Data leakage.** When you compute the mean and standard deviation from the *entire* dataset, the validation fold's data influences the scaling parameters. This means validation data "leaks" into training. The correct approach is to compute scaling parameters from the training folds only, then apply those parameters to the validation fold. This prevents the model from having any indirect knowledge of the validation data.
+:::
+
+---
+
+### Q6. Cross-Validation --- LOOCV Trade-off
+
+Leave-one-out cross-validation (LOOCV) uses n-1 points for training in each fold. Why might 10-fold CV produce a *better* estimate of model performance than LOOCV?
+
+- [ ] (a) 10-fold uses more data for training
+- [ ] (b) LOOCV's n models are highly correlated with each other, leading to high-variance estimates
+- [ ] (c) LOOCV takes less time to compute
+- [ ] (d) 10-fold CV always uses a test set while LOOCV does not
+
+::: {.callout-note collapse="true" title="Answer & Explanation"}
+**(b) High variance due to correlated models.** In LOOCV, each fold uses n-1 of the same n points, so the n trained models are nearly identical. Their validation scores are highly correlated, meaning the average of those scores has high variance (averaging correlated numbers reduces variance less than averaging uncorrelated numbers). 10-fold CV creates more diverse models (each trained on only 90% of data), producing a more stable estimate. LOOCV has lower *bias* but higher *variance*.
+:::
+
+---
+
+### Q7. Clustering --- k-means Failure
+
+Which dataset would cause k-means to fail?
+
+- [ ] (a) Three well-separated spherical clusters of similar size
+- [ ] (b) Two clusters shaped like interlocking crescents
+- [ ] (c) Five clusters in 10-dimensional space
+- [ ] (d) Two clusters of different sizes but both spherical
+
+::: {.callout-note collapse="true" title="Answer & Explanation"}
+**(b) Interlocking crescents.** k-means assigns points to the nearest centroid, which creates spherical (convex) cluster boundaries. Crescent-shaped clusters are non-convex --- the centroid of a crescent is outside the crescent itself. k-means would split each crescent roughly in half and merge halves from different crescents. This is a fundamental limitation of centroid-based clustering.
+:::
+
+---
+
+### F4. Explain: Why Can't You Evaluate a Model on Its Training Data?
+
+Explain to a classmate why 100% training accuracy does not mean you have a good model. Use a concrete analogy.
+
+::: {.callout-tip collapse="true" title="Hint"}
+Think about memorizing answers to a practice test versus understanding the material for a new scenario.
+:::
+
+::: {.callout-note collapse="true" title="Model Answer"}
+Imagine a student who memorizes the answer key to a practice set word-for-word. They score 100% on that exact practice set --- but give them a *new* scenario with different questions and they fail.
+
+Training accuracy is like scoring yourself on the practice set you memorized. The model has seen every training point and can "memorize" them (e.g., KNN with k=1 literally stores every point and achieves 100% training accuracy). But the real question is: can it handle **new, unseen data**?
+
+That's what validation accuracy measures. You hold out data the model has never seen and test on it. If training accuracy is 98% but validation accuracy is 62%, the model memorized the training data without learning the underlying pattern. This is **overfitting**.
+
+The validation score is the truth. Training accuracy tells you almost nothing about how the model will perform in the real world.
+:::
+
+---
+
+### F5. Explain: k-means vs. KNN --- They Sound Similar But Are Completely Different
+
+Someone confuses k-means and KNN because both have a "k." Explain the difference clearly.
+
+::: {.callout-tip collapse="true" title="Hint"}
+One is supervised, one is unsupervised. What does "k" mean in each?
+:::
+
+::: {.callout-note collapse="true" title="Model Answer"}
+Despite both having a "k," these are fundamentally different:
+
+**KNN (K-Nearest Neighbors)** is **supervised** --- you have labeled data (you know the answer for each training point). To classify a new point, you find the k closest training points and take a majority vote. The "k" is the number of neighbors to consult. You choose k using cross-validation.
+
+**k-means** is **unsupervised** --- you have NO labels. You want to discover natural groupings. The algorithm places k centroids, assigns each point to its nearest centroid, moves centroids to the mean of their assigned points, and repeats until stable. The "k" is the number of clusters to find. You choose k using the elbow method.
+
+Quick test: Does your data have labels (categories you want to predict)? Use KNN. No labels and you want to find structure? Use k-means.
+:::
+
+---
+
+### F6. Explain: The Elbow Method for Choosing k
+
+Your manager asks "How do you know how many clusters to use?" Walk them through the elbow method.
+
+::: {.callout-tip collapse="true" title="Hint"}
+What do you plot on the x-axis and y-axis? What does the "elbow" look like and what does it mean?
+:::
+
+::: {.callout-note collapse="true" title="Model Answer"}
+You run k-means for k=1, k=2, k=3, and so on. For each k, you record the **total within-cluster distance** (how spread out the points are within their assigned clusters). Plot k on the x-axis and total distance on the y-axis.
+
+As k increases, the distance always decreases (more clusters = smaller clusters = less spread). But the *rate* of decrease changes. At first, adding a cluster helps a lot (the curve drops steeply). Eventually, adding more clusters barely helps (the curve flattens out).
+
+The "elbow" is where the curve bends --- where adding another cluster stops giving you much improvement. That's your suggested k.
+
+Important caveats: (1) the elbow is not always obvious, (2) there is no single correct k, and (3) you should interpret clusters for business meaning, not just pick a number blindly.
+:::
+
+---
+
+## 3. Data Preparation & Outliers
+
+### Q8. Outlier Handling --- Philosophy
+
+A weather sensor records temperatures for a pharmaceutical shipping company. One reading shows 150degF during a summer heatwave in Arizona. What should you do first?
+
+- [ ] (a) Remove it immediately --- it's clearly an error
+- [ ] (b) Replace it with the daily mean temperature
+- [ ] (c) Investigate whether 150degF is plausible for that location and date
+- [ ] (d) Keep it because all real data should be preserved
+
+::: {.callout-note collapse="true" title="Answer & Explanation"}
+**(c) Investigate first.** The key outlier philosophy is "it depends." 150degF is unrealistic for ambient temperature (world record is 134degF), suggesting a sensor malfunction --- but you must verify. If the sensor was in direct sunlight on a truck surface, 150degF might be real. The investigation determines whether this is bad data (sensor error), a real but unpredictable event, or a systematic issue. Each case requires different handling.
+:::
+
+---
+
+### Q9. Outlier Types
+
+A hospital monitors patient heart rates. Patient A shows a rate of 220 bpm (extremely high but physiologically possible during a seizure). Patient B's ECG flatlines for 3 seconds mid-recording before resuming normally. Which outlier types are these?
+
+- [ ] (a) Both are point outliers
+- [ ] (b) A is a contextual outlier, B is a collective outlier
+- [ ] (c) A is a point outlier, B is a collective outlier
+- [ ] (d) A is a collective outlier, B is a contextual outlier
+
+::: {.callout-note collapse="true" title="Answer & Explanation"}
+**(c) A is a point outlier, B is a collective outlier.** Patient A's single extreme value (220 bpm) is a **point outlier** --- one data point far from the rest. Patient B's ECG flatline is a **collective outlier** --- no single zero-value reading is necessarily unusual, but a *sequence* of flatline readings together is abnormal. A **contextual outlier** would be a normal value appearing in an unusual context (e.g., 100degF body temperature in a healthy person vs. an ICU patient).
+:::
+
+---
+
+### Q10. Outlier --- Two-Model Approach
+
+Your sales data shows occasional extreme spikes (Black Friday, viral social media events). A single regression model either underpredicts during spikes or overpredicts during normal periods. What approach addresses this?
+
+- [ ] (a) Remove all spike data and build one model on normal data
+- [ ] (b) Build a logistic regression to predict if a spike will occur, then build a separate model for spike vs. normal conditions
+- [ ] (c) Use ARIMA with seasonal components to capture the spikes
+- [ ] (d) Apply Box-Cox transformation to compress the spike values
+
+::: {.callout-note collapse="true" title="Answer & Explanation"}
+**(b) Two-model approach.** First, use logistic regression to estimate the *probability* of a spike event based on features (day of year, marketing spend, social media activity). Second, build separate predictive models for normal conditions and spike conditions. This avoids forcing one model to handle fundamentally different behaviors. Removing spikes (a) discards real information. ARIMA (c) handles regular seasonality but not irregular spikes. Box-Cox (d) addresses unequal variance, not bimodal behavior.
+:::
+
+---
+
+### F7. Explain: "It Depends" --- The Outlier Investigation Framework
+
+You detect an outlier in manufacturing data. Walk through the three questions you should ask before deciding what to do with it.
+
+::: {.callout-tip collapse="true" title="Hint"}
+The three categories are: bad data, real-but-unpredictable, and real-and-systematic. Each leads to a different action.
+:::
+
+::: {.callout-note collapse="true" title="Model Answer"}
+When you find an outlier, ask these three questions in order:
+
+**1. Is it bad data?** Did a sensor malfunction? Was there a data entry error? Did a system glitch produce impossible values (negative temperatures in Kelvin, ages over 200)? If yes, either remove it or impute a reasonable value. This is the only case where removal is clearly justified.
+
+**2. Is it real but unpredictable?** Did something genuinely unusual happen that is unlikely to repeat? Example: Chick-fil-A had a massive sales spike due to a one-time controversy. The data point is real, but including it in your model would distort normal predictions. You might remove it and note the event, or build a separate model for extraordinary events.
+
+**3. Is it real and systematic?** Is this outlier caused by a factor your model should capture? Example: A shipping company sees extreme temperature readings during summer in Arizona --- that's a real, recurring pattern. Removing it would make the model dangerously optimistic. You should keep it and potentially add features (season, location) to explain it.
+
+The default answer is always "investigate first." Even experienced analysts can misidentify which category an outlier falls into.
+:::
+
+---
+
+### F8. Explain: Why Might Removing Real Outliers Be Dangerous?
+
+A colleague says "outliers mess up the model, so I always remove them." Explain why this can be worse than keeping them.
+
+::: {.callout-tip collapse="true" title="Hint"}
+Think about a model used for safety-critical decisions. What happens when the real world produces an event the model has never seen?
+:::
+
+::: {.callout-note collapse="true" title="Model Answer"}
+Consider a pharmaceutical company shipping temperature-sensitive medicine. Their historical data includes a few extreme heat events during transport. If you remove those outliers, the model predicts smooth, moderate temperatures --- and the company designs packaging for normal conditions only.
+
+Then a real heat event happens. The packaging fails, the medicine degrades, and patients receive ineffective drugs. The model was "cleaner" without outliers but **dangerously optimistic** about real-world conditions.
+
+Removing real outliers teaches the model that extreme events don't exist. But they do. A robust model should either account for them directly (include them in training) or acknowledge them through a two-model approach (one model for normal conditions, one that flags high-risk situations).
+
+The lesson: removing outliers isn't cleaning your data --- it might be hiding the most important information in it.
+:::
+
+---
+
+## 4. Change Detection --- CUSUM
+
+### Q11. CUSUM --- Formula Mechanics
+
+Given CUSUM formula $S_t = \max(0, S_{t-1} + (x_t - \mu) - C)$ with $\mu = 100$, $C = 5$, $T = 12$, and $S_0 = 0$. If the next three observations are $x_1 = 108$, $x_2 = 95$, $x_3 = 112$, what are $S_1$, $S_2$, $S_3$?
+
+- [ ] (a) $S_1 = 3$, $S_2 = 0$, $S_3 = 7$
+- [ ] (b) $S_1 = 3$, $S_2 = -7$, $S_3 = 0$
+- [ ] (c) $S_1 = 8$, $S_2 = 3$, $S_3 = 10$
+- [ ] (d) $S_1 = 3$, $S_2 = 0$, $S_3 = 12$ (alarm triggered)
+
+::: {.callout-note collapse="true" title="Answer & Explanation"}
+**(a)**
+
+- $S_1 = \max(0, 0 + (108 - 100) - 5) = \max(0, 3) = 3$
+- $S_2 = \max(0, 3 + (95 - 100) - 5) = \max(0, -7) = 0$ (reset to zero)
+- $S_3 = \max(0, 0 + (112 - 100) - 5) = \max(0, 7) = 7$
+
+No alarm since $S_t < T = 12$ for all t. Note how $S_2$ resets to 0 --- the $\max(0, \ldots)$ prevents negative accumulation, so the CUSUM only tracks sustained upward shifts.
+:::
+
+---
+
+### Q12. CUSUM --- Parameter Trade-off
+
+A factory manager says "I'm getting too many false alarms from CUSUM but I also need to detect real changes quickly." What is the fundamental problem with this request?
+
+- [ ] (a) CUSUM cannot be tuned --- C and T are fixed by the data
+- [ ] (b) Reducing false alarms (increase C or T) necessarily slows detection --- you cannot optimize both simultaneously
+- [ ] (c) False alarms indicate the baseline mean $\mu$ is wrong, not the parameters
+- [ ] (d) CUSUM is only for detecting upward shifts, so the false alarms may be from downward shifts
+
+::: {.callout-note collapse="true" title="Answer & Explanation"}
+**(b) Fundamental trade-off.** This is the core tension in CUSUM. Increasing T (threshold) or C (allowance) reduces false alarms but also means real changes take longer to detect. Decreasing them catches changes faster but triggers more false alarms. There is no free lunch --- the right balance depends on the **cost of a false alarm vs. the cost of delayed detection**. A nuclear power plant prioritizes fast detection (low C, low T). A marketing team may tolerate slower detection to avoid costly false reactions (high C, high T).
+:::
+
+---
+
+### Q13. CUSUM --- Limitations
+
+CUSUM detects a significant shift in a manufacturing process. Your manager asks "What caused the change?" Can CUSUM answer this?
+
+- [ ] (a) Yes --- CUSUM identifies the root cause along with the detection
+- [ ] (b) No --- CUSUM detects *that* a change occurred, not *why*
+- [ ] (c) Only if you include causal variables in the CUSUM formula
+- [ ] (d) Yes, if the shift is large enough
+
+::: {.callout-note collapse="true" title="Answer & Explanation"}
+**(b) CUSUM detects change, not cause.** CUSUM is a monitoring tool that signals when a process mean has shifted. It cannot explain why. The shift could be a new supplier, a machine wearing out, a seasonal effect, or anything else. Investigation is always needed after a CUSUM alarm. This is a general principle: **models detect patterns, not explanations.** Causation requires domain knowledge and controlled experiments.
+:::
+
+---
+
+### F9. Explain: The CUSUM Formula in Plain English
+
+Walk through $S_t = \max(0, S_{t-1} + (x_t - \mu) - C)$ for someone who has never seen it. Explain each piece and why the $\max(0, \ldots)$ matters.
+
+::: {.callout-tip collapse="true" title="Hint"}
+Think of $S_t$ as a running score that increases when observations are above normal and resets when things look fine.
+:::
+
+::: {.callout-note collapse="true" title="Model Answer"}
+Think of CUSUM as a suspicion meter:
+
+- **$\mu$** is the "normal" value --- what you expect the process to produce.
+- **$x_t - \mu$** is how far today's observation is from normal. Positive means above normal.
+- **$C$** is the allowance --- how much above-normal you're willing to tolerate before getting suspicious. Small random fluctuations below C are ignored.
+- **$S_{t-1}$** is yesterday's suspicion level. Today's suspicion builds on yesterday's.
+- **$\max(0, \ldots)$** means suspicion never goes negative. If a good observation drives the formula negative, it resets to zero. Without this, a long stretch of below-normal values would create a "buffer" that masks a future real shift.
+- **$T$** (threshold): when suspicion $S_t$ exceeds $T$, you sound the alarm.
+
+The genius of CUSUM is that it accumulates evidence. A single observation 2 units above normal might be noise. But *five consecutive* observations 2 units above normal (with $C = 1$) build $S_t$ to $5 \times (2-1) = 5$. CUSUM catches sustained shifts that individual measurements would miss.
+:::
+
+---
+
+### F10. Explain: How Would You Set C and T for Different Contexts?
+
+A nuclear power plant and a retail marketing team both want to use CUSUM. How should each set their parameters, and why?
+
+::: {.callout-tip collapse="true" title="Hint"}
+What is the cost of a false alarm vs. the cost of a missed detection for each organization?
+:::
+
+::: {.callout-note collapse="true" title="Model Answer"}
+**Nuclear power plant:**
+
+- **Cost of missed detection:** Catastrophic --- meltdown, radiation exposure, loss of life
+- **Cost of false alarm:** Expensive (shutdown, investigation) but manageable
+- **Settings:** Low C (small allowance, suspicious of any deviation) and low T (low threshold, trigger alarm quickly). Accept many false alarms to ensure no real shift goes undetected.
+
+**Retail marketing team:**
+
+- **Cost of missed detection:** Moderate --- a campaign underperforms for a few days before you notice
+- **Cost of false alarm:** Wasted budget pulling a campaign that was actually fine, team disruption
+- **Settings:** Higher C (tolerate normal variation in sales) and higher T (require strong evidence before reacting). Accept slower detection to avoid knee-jerk reactions to normal fluctuations.
+
+The lesson: there are no universally "correct" parameter values. C and T encode your organization's risk tolerance and the relative cost of each type of error. The same math, very different settings.
+:::
+
+---
+
+## 5. Time Series Forecasting
+
+### Q14. Exponential Smoothing --- Naming
+
+Why is it called "exponential" smoothing?
+
+- [ ] (a) The forecast grows exponentially over time
+- [ ] (b) Past observations are weighted by exponentially decaying factors $\alpha(1-\alpha)^k$
+- [ ] (c) The smoothing parameter $\alpha$ is raised to an exponential power
+- [ ] (d) It uses the exponential distribution to model errors
+
+::: {.callout-note collapse="true" title="Answer & Explanation"}
+**(b) Exponentially decaying weights.** When you expand the recursive formula, an observation from $k$ periods ago receives weight $\alpha(1-\alpha)^k$. Since $0 < (1-\alpha) < 1$, this weight decreases exponentially as $k$ increases. Recent observations get the most weight, but old observations are never completely forgotten (their weight approaches zero but never reaches it).
+:::
+
+---
+
+### Q15. Holt-Winters --- Component Matching
+
+In triple exponential smoothing (Holt-Winters), which parameter controls which component?
+
+- [ ] (a) $\alpha$ = trend, $\beta$ = level, $\gamma$ = seasonality
+- [ ] (b) $\alpha$ = level, $\beta$ = trend, $\gamma$ = seasonality
+- [ ] (c) $\alpha$ = seasonality, $\beta$ = level, $\gamma$ = trend
+- [ ] (d) All three parameters control all three components equally
+
+::: {.callout-note collapse="true" title="Answer & Explanation"}
+**(b)** $\alpha$ controls the **level** (baseline value), $\beta$ controls the **trend** (upward/downward direction), and $\gamma$ controls the **seasonality** (repeating patterns). Simple exponential smoothing uses only $\alpha$. Adding a trend requires Holt's method ($\alpha$ + $\beta$). Adding seasonality requires the full Holt-Winters ($\alpha$ + $\beta$ + $\gamma$).
+:::
+
+---
+
+### Q16. ARIMA --- Equivalence
+
+What is ARIMA(0,1,1) equivalent to?
+
+- [ ] (a) Linear regression with one predictor
+- [ ] (b) Simple exponential smoothing
+- [ ] (c) Holt's double exponential smoothing
+- [ ] (d) A random walk
+
+::: {.callout-note collapse="true" title="Answer & Explanation"}
+**(b) Simple exponential smoothing.** ARIMA(0,1,1) means: 0 autoregressive terms, 1 differencing step, and 1 moving average term. This mathematical specification produces forecasts equivalent to simple exponential smoothing. A random walk would be ARIMA(0,1,0). This fact highlights that exponential smoothing and ARIMA are different frameworks for the same underlying patterns.
+:::
+
+---
+
+### Q17. Model Choice --- Volatility vs. Values
+
+A hedge fund wants two things: (1) forecast tomorrow's stock price, and (2) forecast how volatile the market will be next week. Which models?
+
+- [ ] (a) ARIMA for both
+- [ ] (b) GARCH for price, ARIMA for volatility
+- [ ] (c) ARIMA (or exponential smoothing) for price, GARCH for volatility
+- [ ] (d) Exponential smoothing for both
+
+::: {.callout-note collapse="true" title="Answer & Explanation"}
+**(c)** ARIMA or exponential smoothing forecast **values** (tomorrow's price). GARCH forecasts **variance/volatility** (how much the price is expected to fluctuate). GARCH does not predict direction --- it predicts the magnitude of uncertainty. These are complementary models answering different questions.
+:::
+
+---
+
+### F11. Explain: ARIMA vs. Exponential Smoothing --- When to Use Each
+
+Your team is deciding between ARIMA and exponential smoothing for quarterly sales forecasts. Explain the trade-offs.
+
+::: {.callout-tip collapse="true" title="Hint"}
+Think about: dataset size, noise level, and complexity of the pattern.
+:::
+
+::: {.callout-note collapse="true" title="Model Answer"}
+**Exponential smoothing** is simpler and more robust:
+
+- Works well with short time series (even 10-20 observations)
+- Handles noisy data and outliers gracefully (recent data gets high weight, old outliers fade away)
+- Few parameters to tune ($\alpha$, optionally $\beta$ and $\gamma$)
+- Good default choice when you're unsure
+
+**ARIMA** is more flexible and powerful:
+
+- Needs more data (typically 40+ observations) to reliably estimate parameters
+- Can model complex autocorrelation patterns that exponential smoothing cannot
+- Requires stationarity (differencing handles trends, but you need to verify)
+- More parameters (p, d, q) that require careful selection (often via AIC/BIC)
+
+**Rule of thumb:** Start with exponential smoothing. If you have plenty of data and the residuals show patterns that exponential smoothing misses, try ARIMA. For most business forecasting with limited data, exponential smoothing is the pragmatic choice.
+
+Fun fact: ARIMA(0,1,1) is mathematically equivalent to simple exponential smoothing --- they're different frameworks that can produce the same result.
+:::
+
+---
+
+### F12. Explain: What Does GARCH Forecast?
+
+Your manager says "Let's use GARCH to predict next month's revenue." Explain why this is a misunderstanding.
+
+::: {.callout-tip collapse="true" title="Hint"}
+GARCH forecasts _______, not _______.
+:::
+
+::: {.callout-note collapse="true" title="Model Answer"}
+GARCH forecasts **variance** (volatility), not **values**.
+
+If your manager asks "What will revenue be next month?" --- GARCH cannot answer that. Use ARIMA or exponential smoothing.
+
+But if your manager asks "How uncertain is next month's revenue? Should we hold extra cash reserves?" --- GARCH is the right tool. It models how the size of fluctuations changes over time. In financial markets, volatility clusters: big price swings tend to follow big swings, and calm periods follow calm periods. GARCH captures this pattern.
+
+Think of it this way: ARIMA tells you the weather forecast is 72degF. GARCH tells you whether to trust that forecast --- if volatility is high, the actual temperature might range from 60degF to 84degF; if volatility is low, maybe 70degF to 74degF.
+:::
+
+---
+
+## 6. Regression
+
+### Q18. Regression --- Practical vs. Statistical Significance
+
+A company runs a regression on 500,000 customer records and finds: `revenue = 10,000 + 0.002 * email_opens`, with $p < 0.001$ and $R^2 = 0.001$. What should they conclude?
+
+- [ ] (a) Email opens are a strong predictor of revenue --- the p-value proves it
+- [ ] (b) The relationship is statistically significant but practically meaningless --- $R^2$ explains 0.1% of variation
+- [ ] (c) The model is invalid because the coefficient is too small
+- [ ] (d) They need more data to determine significance
+
+::: {.callout-note collapse="true" title="Answer & Explanation"}
+**(b) Statistically significant but practically meaningless.** With 500,000 records, even tiny effects achieve tiny p-values. The p-value tells you the relationship is unlikely due to chance, but $R^2 = 0.001$ means email opens explain only 0.1% of revenue variation. The coefficient of 0.002 means each additional email open is associated with $0.002 more revenue. Statistically real? Yes. Worth acting on? Almost certainly not. **Large samples make everything significant --- practical significance requires judgment.**
+:::
+
+---
+
+### Q19. Regression --- Causation Trap
+
+A city finds a strong correlation ($r = 0.92$) between ice cream sales and drowning deaths across summer months. A city council member proposes restricting ice cream sales near beaches. What is wrong with this reasoning?
+
+- [ ] (a) The correlation is not strong enough to act on
+- [ ] (b) Correlation does not imply causation --- a confounding variable (temperature/season) likely drives both
+- [ ] (c) The data needs more observations before drawing conclusions
+- [ ] (d) Drowning causes ice cream sales, not the other way around
+
+::: {.callout-note collapse="true" title="Answer & Explanation"}
+**(b) Correlation $\neq$ causation.** Hot weather increases both ice cream purchases and swimming activity (which increases drowning risk). Temperature is the **confounding variable** driving both. Restricting ice cream would not reduce drownings. Establishing causation requires: (1) temporal precedence (cause before effect), (2) a plausible mechanism, and (3) ruling out confounders --- ideally through controlled experiments. Regression alone cannot establish any of these.
+:::
+
+---
+
+### Q20. Regression --- Adjusted R-squared
+
+You add 15 random noise variables (generated from random numbers with no relationship to the response) to a regression model. What happens to $R^2$ and adjusted $R^2$?
+
+- [ ] (a) Both increase
+- [ ] (b) Both decrease
+- [ ] (c) $R^2$ increases, adjusted $R^2$ decreases
+- [ ] (d) $R^2$ stays the same, adjusted $R^2$ decreases
+
+::: {.callout-note collapse="true" title="Answer & Explanation"}
+**(c)** $R^2$ **always** increases (or stays the same) when you add predictors, even random noise. It's a mathematical property --- more variables can only reduce residual variance on the training data, even by accident. Adjusted $R^2$ penalizes model complexity, so adding useless variables causes the penalty to outweigh the tiny $R^2$ gain, and adjusted $R^2$ decreases. This is why adjusted $R^2$ (or AIC/BIC) is preferred for model comparison over raw $R^2$.
+:::
+
+---
+
+### Q21. Regression --- Residual Diagnostics
+
+Your regression residual plot shows a clear fan shape (residuals spread wider as the fitted values increase). What does this indicate and what is the fix?
+
+- [ ] (a) Multicollinearity --- remove correlated predictors
+- [ ] (b) Non-linearity --- add polynomial terms
+- [ ] (c) Heteroscedasticity (unequal variance) --- apply Box-Cox transformation
+- [ ] (d) Outliers --- remove extreme points
+
+::: {.callout-note collapse="true" title="Answer & Explanation"}
+**(c) Heteroscedasticity.** The fan shape means the variance of errors is not constant --- it increases with the fitted value. This violates a key regression assumption. **Box-Cox transformation** addresses this by finding a power transformation ($y^\lambda$) that stabilizes the variance. The special case $\lambda = 0$ corresponds to $\log(y)$, which is common for financial data where variance scales with magnitude.
+:::
+
+---
+
+### F13. Explain: Why Doesn't a Significant Regression Prove Causation?
+
+A researcher shows you a regression with $p < 0.001$ and says "This proves X causes Y." Explain why they are wrong, using the ice cream and drowning example.
+
+::: {.callout-tip collapse="true" title="Hint"}
+What three conditions are needed for causation? Which ones does regression check?
+:::
+
+::: {.callout-note collapse="true" title="Model Answer"}
+Regression tells you that two variables move together and that the pattern is unlikely due to chance. That's it. It does not establish causation.
+
+Causation requires three things that regression cannot verify:
+
+1. **Temporal precedence:** The cause must come before the effect. Regression uses simultaneous data --- it doesn't know which happened first.
+
+2. **Plausible mechanism:** There must be a logical reason why X would cause Y. Ice cream sales and drowning deaths correlate ($r = 0.92$) because hot weather drives both. There is no mechanism by which buying ice cream makes someone drown.
+
+3. **No confounders:** You must rule out third variables that drive both X and Y. Temperature is the confounder here. Without controlling for it, the regression just measures the shadow of a hidden variable.
+
+A p-value of 0.001 means "there is a 0.1% chance this correlation appeared by random chance." It says nothing about *why* the correlation exists. The only reliable way to establish causation is a **controlled experiment** (randomize who gets X, measure Y, control everything else).
+:::
+
+---
+
+### F14. Explain: R-squared vs. Adjusted R-squared
+
+A junior analyst shows you a model with $R^2 = 0.92$ and 47 predictors. They say "This is a great model!" Explain why you're not convinced.
+
+::: {.callout-tip collapse="true" title="Hint"}
+What happens to $R^2$ when you keep adding variables, even useless ones?
+:::
+
+::: {.callout-note collapse="true" title="Model Answer"}
+$R^2$ measures what fraction of the response variable's variation the model explains. Sounds great --- higher is better, right?
+
+The problem: $R^2$ **always increases** when you add more predictors, even if those predictors are random noise. With 47 predictors, the model has enough flexibility to fit the training data well by chance. An $R^2$ of 0.92 with 47 predictors might drop to 0.40 on new data.
+
+**Adjusted $R^2$** fixes this by penalizing model complexity. It asks: "Is the improvement in fit worth the cost of adding this variable?" If a new variable doesn't improve the model enough to justify its inclusion, adjusted $R^2$ goes *down* even though $R^2$ went up.
+
+You should check: (1) adjusted $R^2$ or AIC/BIC, (2) validation accuracy on held-out data, and (3) whether 47 predictors is reasonable for the problem. A model with 5 predictors and $R^2 = 0.80$ might generalize far better than one with 47 predictors and $R^2 = 0.92$.
+:::
+
+---
+
+## 7. Transformations & PCA
+
+### Q22. PCA --- The Critical Weakness
+
+You apply PCA to 50 correlated stock-market features and keep the first 3 principal components (explaining 95% of total variance in X). Your prediction model using these 3 components performs poorly. What is the most likely explanation?
+
+- [ ] (a) 3 components are too few --- you need at least 10
+- [ ] (b) PCA maximizes variance in X, which may not align with predictive power for Y --- the signal for Y might live in the low-variance components you discarded
+- [ ] (c) PCA only works with uncorrelated features
+- [ ] (d) The stock market is inherently unpredictable
+
+::: {.callout-note collapse="true" title="Answer & Explanation"}
+**(b) PCA optimizes for X variance, not Y prediction.** This is PCA's critical weakness. The components that explain the most variance in the predictors (X) might capture market-wide trends (like "stocks go up together") that don't predict your specific target (Y). The *low-variance* components you discarded might capture subtle sector-specific signals that are exactly what predicts Y. PCA does not know Y exists. Always validate PCA-reduced models against the original.
+:::
+
+---
+
+### Q23. Box-Cox --- Lambda Values
+
+In a Box-Cox transformation, what does $\lambda = 0$ mean?
+
+- [ ] (a) No transformation is needed
+- [ ] (b) Apply a square root transformation
+- [ ] (c) Apply a log transformation
+- [ ] (d) Apply a reciprocal transformation
+
+::: {.callout-note collapse="true" title="Answer & Explanation"}
+**(c) Log transformation.** The Box-Cox formula is $y^\lambda$ for $\lambda \neq 0$ and $\log(y)$ for $\lambda = 0$. This is a mathematical convention (the limit of $(y^\lambda - 1)/\lambda$ as $\lambda \to 0$ is $\log(y)$). Other common values: $\lambda = 0.5$ is square root, $\lambda = -1$ is reciprocal. Software finds the optimal $\lambda$ automatically.
+:::
+
+---
+
+### Q24. PCA --- When to Use
+
+In which scenario is PCA most helpful?
+
+- [ ] (a) You have 10 uncorrelated predictors and 1,000 observations
+- [ ] (b) You have 200 highly correlated predictors and 50 observations
+- [ ] (c) You have 3 predictors and want to improve interpretability
+- [ ] (d) You have a binary outcome and want probability estimates
+
+::: {.callout-note collapse="true" title="Answer & Explanation"}
+**(b)** PCA shines when you have many correlated predictors (multicollinearity) and especially when predictors outnumber observations. With 200 correlated predictors and only 50 observations, regression would fail (more unknowns than equations). PCA reduces 200 correlated variables to a handful of uncorrelated components, making the problem tractable. Scenario (a) doesn't need PCA (predictors are already uncorrelated). Scenario (c) --- PCA actually *reduces* interpretability. Scenario (d) calls for logistic regression.
+:::
+
+---
+
+### F15. Explain: Why Must You Standardize Before PCA?
+
+A colleague runs PCA on raw data where income is in dollars and age is in years. Explain why this is a problem.
+
+::: {.callout-tip collapse="true" title="Hint"}
+PCA finds directions of maximum variance. What happens when one variable's variance is millions while another's is tens?
+:::
+
+::: {.callout-note collapse="true" title="Model Answer"}
+PCA looks for the direction in which the data varies the most. If income ranges from $20,000 to $200,000 and age ranges from 18 to 80, income has variance on the order of billions (in squared dollars) while age has variance around hundreds (in squared years).
+
+Without standardizing, the first principal component will essentially be "income" because that's where the most raw variance lives. Age is invisible --- not because it's unimportant, but because its numbers are smaller.
+
+Standardizing (subtracting the mean and dividing by the standard deviation) puts every variable on the same scale: mean 0, standard deviation 1. Now PCA can find the directions of maximum variation without being dominated by whichever variable happens to have the largest units. This is the same reason you scale before SVM and KNN --- these methods all use magnitudes or distances, so scale matters.
+:::
+
+---
+
+### F16. Explain: PCA Components --- What Are You Actually Keeping?
+
+Your manager asks "You reduced 20 features to 5 using PCA. What are those 5 things?" Explain what principal components represent.
+
+::: {.callout-tip collapse="true" title="Hint"}
+Components are linear combinations of the original features, not a subset of them.
+:::
+
+::: {.callout-note collapse="true" title="Model Answer"}
+Principal components are **not** 5 of your original 20 features. They are 5 new features, each one a weighted combination of all 20 originals.
+
+Think of it like mixing paint colors. You start with 20 specific paint colors (features). PCA doesn't pick 5 colors --- it creates 5 *new* colors by blending all 20 in different proportions. The first blend (PC1) captures the most variation in your data. The second blend (PC2) captures the most remaining variation, and so on.
+
+Each component's "recipe" (which original features contribute most) is given by the **eigenvector**. The "importance" of each component (how much variation it captures) is given by the **eigenvalue**.
+
+The trade-off: you've reduced 20 dimensions to 5, making your model faster and avoiding multicollinearity. But you've lost interpretability --- "a coefficient of 3.2 on PC1" is harder to explain than "a coefficient of 3.2 on income." This is the compression cost.
+:::
+
+---
+
+## 8. Trees, Forests & Logistic Regression
+
+### Q25. CART --- Splitting Criterion
+
+How does a classification tree (CART) decide which feature to split on at each node?
+
+- [ ] (a) It picks the feature with the highest correlation to the response
+- [ ] (b) It tries every feature and every split point, choosing the one that maximizes the reduction in impurity (e.g., Gini)
+- [ ] (c) It picks features in order of importance determined before building the tree
+- [ ] (d) It randomly selects features to split on
+
+::: {.callout-note collapse="true" title="Answer & Explanation"}
+**(b) Exhaustive search.** At each node, CART evaluates every possible feature and every possible split point for that feature. For each candidate split, it computes the resulting impurity (Gini for classification, variance for regression) in the two child nodes. It picks the split that produces the greatest reduction in impurity. This greedy, exhaustive approach is why trees are computationally straightforward but can be slow with many features.
+:::
+
+---
+
+### Q26. CART --- Overfitting
+
+A decision tree achieves 100% accuracy on 500 training points. It has 200 leaf nodes. What is wrong?
+
+- [ ] (a) Nothing --- 100% accuracy is always desirable
+- [ ] (b) The tree has overfit --- with 200 leaves and 500 points, each leaf has ~2.5 points (too few to generalize)
+- [ ] (c) 200 leaves is normal for 500 data points
+- [ ] (d) The tree needs more splits to improve further
+
+::: {.callout-note collapse="true" title="Answer & Explanation"}
+**(b) Overfitting.** A practical heuristic is that each leaf should contain at least 5% of the training data --- for 500 points, that's at least 25 points per leaf. With 200 leaves averaging 2.5 points each, the tree has essentially memorized the training data. It will perform poorly on new data. The fix is **pruning**: grow the tree fully, then prune back nodes that don't improve validation accuracy.
+:::
+
+---
+
+### Q27. CART --- Scale Invariance
+
+Unlike SVM and KNN, CART does not require feature scaling. Why?
+
+- [ ] (a) CART uses correlations instead of distances
+- [ ] (b) CART splits on one feature at a time, so the scale of other features is irrelevant at each split
+- [ ] (c) CART automatically normalizes features internally
+- [ ] (d) Feature scaling would change the tree structure
+
+::: {.callout-note collapse="true" title="Answer & Explanation"}
+**(b) One feature at a time.** CART splits on a single feature at each node. It asks "Is income > $50,000?" or "Is age > 30?" --- each split involves only one feature's values. The scale of income doesn't interact with the scale of age because they're never combined in a distance calculation. SVM and KNN compute distances between points using all features simultaneously, so unequal scales create unequal influence. CART avoids this entirely.
+:::
+
+---
+
+### Q28. Random Forest --- Why It Works
+
+Why does averaging 500 overfit trees (random forest) produce better predictions than a single carefully pruned tree?
+
+- [ ] (a) Each tree sees all the data and all features, so averaging stabilizes the predictions
+- [ ] (b) Bootstrap sampling and random feature subsets cause each tree to overfit in different ways; averaging cancels out the idiosyncratic errors
+- [ ] (c) Random forests use a different splitting criterion than CART
+- [ ] (d) The 500 trees are pruned individually before averaging
+
+::: {.callout-note collapse="true" title="Answer & Explanation"}
+**(b) Diverse overfitting cancels out.** Each tree gets a bootstrap sample (random subset with replacement) of the data, and at each split considers only a random subset of features (typically $1 + \log_2(n)$ features). This ensures the 500 trees are different --- they overfit to different patterns and different noise. When you average their predictions, the idiosyncratic errors cancel out while the real signal reinforces. No pruning is needed because the averaging itself smooths out overfitting.
+:::
+
+---
+
+### Q29. Confusion Matrix --- Cost Analysis
+
+Two spam filters are evaluated on 1,000 emails (600 spam, 400 legitimate):
+
+| | Filter A | Filter B |
+|---|---|---|
+| True Positives (spam caught) | 540 | 580 |
+| False Positives (legit marked spam) | 40 | 100 |
+| False Negatives (spam missed) | 60 | 20 |
+| True Negatives (legit passed) | 360 | 300 |
+
+A missed spam costs $1 (annoyance). A legitimate email marked as spam costs $50 (missed business opportunity). Which filter has lower total cost?
+
+- [ ] (a) Filter A (total cost: $2,060)
+- [ ] (b) Filter B (total cost: $5,020)
+- [ ] (c) Filter A is cheaper because it has higher accuracy
+- [ ] (d) They have equal cost
+
+::: {.callout-note collapse="true" title="Answer & Explanation"}
+**(a) Filter A: $2,060.**
+
+- Filter A: $(60 \times \$1) + (40 \times \$50) = \$60 + \$2,000 = \$2,060$
+- Filter B: $(20 \times \$1) + (100 \times \$50) = \$20 + \$5,000 = \$5,020$
+
+Filter B has higher accuracy (88% vs. 90%) and catches more spam --- but it also misclassifies 2.5x more legitimate emails. When the cost of a false positive ($50) far exceeds the cost of a false negative ($1), the "less accurate" filter is economically superior. **Accuracy alone is misleading when misclassification costs are asymmetric.**
+:::
+
+---
+
+### F17. Explain: Why Do Random Forests Sacrifice Interpretability?
+
+A financial regulator says "I need to understand WHY your model denied this loan." Explain why you can't answer this with a random forest, and what model you'd use instead.
+
+::: {.callout-tip collapse="true" title="Hint"}
+Can you trace a single decision path through 500 trees? What does a single CART tree give you instead?
+:::
+
+::: {.callout-note collapse="true" title="Model Answer"}
+A single decision tree gives you a clear narrative: "The loan was denied because income < $40K AND credit score < 620 AND debt-to-income ratio > 0.5." You can trace the exact path from root to leaf and explain each decision point. A loan officer can point to the specific rules and say "here's why."
+
+A random forest averages the predictions of 500 different trees. Each tree was built on a different random sample of data and considered different random subsets of features at each split. The trees disagree with each other --- some might approve the loan, others deny it. The final answer is just the majority vote.
+
+You cannot trace a meaningful narrative through 500 trees. You can report "variable importance" (which features were used most across all trees), but that tells you what matters *in general*, not why *this specific loan* was denied.
+
+In finance and healthcare, explainability is often a **legal requirement**. When you must explain individual decisions, use a single CART tree, logistic regression, or linear regression. When prediction accuracy matters more than explanation (and regulations allow it), random forests are powerful.
+:::
+
+---
+
+### F18. Explain: CART's Grow-and-Prune Strategy
+
+Explain why CART first grows a tree as deep as possible and then prunes it back, rather than stopping growth early.
+
+::: {.callout-tip collapse="true" title="Hint"}
+What if a weak split at level 3 enables a very strong split at level 4? What happens if you stop at level 3?
+:::
+
+::: {.callout-note collapse="true" title="Model Answer"}
+Imagine a tree where splitting on "zipcode" at level 3 barely improves impurity. If you stop growing early ("this split isn't good enough"), you'd never discover that *within* that zipcode group, splitting on "income" at level 4 produces nearly pure nodes. The level-3 split was weak by itself but essential as a stepping stone.
+
+So CART takes a two-phase approach:
+
+**Phase 1 --- Grow:** Build the tree as deep as possible, splitting until leaves are pure or too small. This tree is overfit (possibly 100% training accuracy with tiny leaves), but it hasn't missed any important splits.
+
+**Phase 2 --- Prune:** Walk back up the tree and remove splits that don't improve validation accuracy. Use a pruning threshold: if removing a split reduces training accuracy by less than $\Delta$, prune it (the complexity isn't worth the tiny gain). Also enforce a minimum leaf size (heuristic: at least 5% of training data per leaf).
+
+The result: you keep the important deep splits while removing the noise. This is better than stopping early because you never prematurely close off branches that might contain valuable structure.
+:::
+
+---
+
+### F19. Explain: Logistic Regression --- Why Not Just Use Linear Regression for Binary Outcomes?
+
+Someone asks "If I want to predict yes/no, can't I just use regular linear regression with 0 and 1 as the response?" Explain why logistic regression exists.
+
+::: {.callout-tip collapse="true" title="Hint"}
+What values can linear regression predict? What values make sense for a probability?
+:::
+
+::: {.callout-note collapse="true" title="Model Answer"}
+Linear regression predicts unbounded numbers: $\hat{y} = a_0 + a_1 x_1 + \ldots$ can produce any value from $-\infty$ to $+\infty$. If you use 0 and 1 as the response, the model might predict $-0.3$ or $1.7$ for some inputs. What does a probability of $-0.3$ or $1.7$ mean? Nothing --- probabilities must be between 0 and 1.
+
+Logistic regression fixes this by passing the linear combination through a **sigmoid function**: $P(Y=1) = \frac{1}{1 + e^{-(a_0 + a_1 x_1 + \ldots)}}$. The sigmoid squashes any input into the (0, 1) range, so the output is always a valid probability.
+
+Additionally, logistic regression handles the fact that the relationship between predictors and probability is typically S-shaped, not a straight line. As study hours increase from 0 to 100, the probability of passing goes from near 0 to near 1, but it doesn't increase linearly --- it accelerates in the middle and flattens at the extremes. The sigmoid naturally captures this shape.
+:::
+
+---
+
+## 9. Cross-Module Integration
+
+### Q30. Pipeline --- Correlated Predictors + Probability Output
+
+You have 100 highly correlated predictors and need to estimate the probability that a customer will churn. What modeling pipeline is most appropriate?
+
+- [ ] (a) KNN directly on all 100 features
+- [ ] (b) PCA to reduce dimensionality, then logistic regression on the components
+- [ ] (c) Linear regression on all 100 features
+- [ ] (d) CUSUM to detect churn patterns
+
+::: {.callout-note collapse="true" title="Answer & Explanation"}
+**(b) PCA then logistic regression.** PCA addresses the multicollinearity (100 correlated features) by reducing to a few uncorrelated components. Logistic regression provides the probability output (bounded 0-1) needed for churn estimation. KNN on 100 features suffers from the curse of dimensionality. Linear regression doesn't output probabilities. CUSUM monitors processes over time, not cross-sectional predictions.
+:::
+
+---
+
+### Q31. Supervised vs. Unsupervised --- Choosing the Framework
+
+Match each scenario to the correct approach:
+
+*Select all correct pairings:*
+
+- [x] (a) Customer purchase history, no predefined segments $\rightarrow$ k-means
+- [ ] (b) Historical loan data with default labels $\rightarrow$ k-means
+- [x] (c) Patient data with diagnosis labels, want probability of disease $\rightarrow$ logistic regression
+- [ ] (d) Temperature sensor data, want to detect if machine drifts $\rightarrow$ SVM
+
+::: {.callout-note collapse="true" title="Answer & Explanation"}
+**(a) and (c) are correct.**
+
+- (a) No labels + want to discover groups = unsupervised = **k-means**
+- (b) Labeled data (default yes/no) calls for supervised classification (SVM, logistic, CART) --- not k-means
+- (c) Labels + probability output = **logistic regression**
+- (d) Detecting drift in a process over time = **CUSUM**, not SVM. SVM classifies individual points, not temporal shifts.
+:::
+
+---
+
+### Q32. Model Selection --- Interpretability Constraint
+
+A bank must legally explain why each loan application was approved or denied. They have labeled historical data with 15 features. Which model is most appropriate?
+
+- [ ] (a) Random forest (best accuracy)
+- [ ] (b) SVM with RBF kernel (handles non-linear boundaries)
+- [ ] (c) Single CART tree or logistic regression (explainable decisions)
+- [ ] (d) KNN with k=5
+
+::: {.callout-note collapse="true" title="Answer & Explanation"}
+**(c) CART or logistic regression.** When explainability is a **legal requirement**, black-box models (random forests, SVM with non-linear kernels, KNN) are inappropriate even if they predict better. A single CART tree provides explicit if-then rules ("denied because income < $40K and debt ratio > 0.4"). Logistic regression provides coefficients showing each feature's contribution. In finance and healthcare, the ability to explain individual decisions often outweighs marginal gains in accuracy.
+:::
+
+---
+
+### Q33. Transformation Sequencing
+
+Your regression residuals show a fan shape (unequal variance) AND a U-shaped pattern (non-linearity). In what order should you apply fixes?
+
+- [ ] (a) Fix non-linearity first (add polynomial terms), then check if variance stabilizes
+- [ ] (b) Apply Box-Cox first (stabilize variance), then address non-linearity
+- [ ] (c) Fix both simultaneously by adding more predictors
+- [ ] (d) The order doesn't matter
+
+::: {.callout-note collapse="true" title="Answer & Explanation"}
+**(a) Fix non-linearity first.** The apparent heteroscedasticity (fan shape) might be a symptom of the non-linear relationship, not a separate problem. If you add polynomial terms or other non-linear transformations and the fan shape disappears, you've solved both issues. If the fan shape persists after fixing non-linearity, then apply Box-Cox. Applying Box-Cox first to data with a non-linear relationship can obscure the underlying structure.
+:::
+
+---
+
+### F20. Explain: How Would You Build a Complete Predictive System?
+
+Your company wants to predict which customers will cancel their subscription next month AND understand why. You have 200 features, many correlated, and 10,000 labeled records. Walk through your modeling pipeline.
+
+::: {.callout-tip collapse="true" title="Hint"}
+Think about: feature reduction, model choice for probability + interpretability, validation strategy.
+:::
+
+::: {.callout-note collapse="true" title="Model Answer"}
+Here's a step-by-step pipeline:
+
+**1. Data preparation:** Check for outliers (investigate, don't auto-remove). Scale features if needed for distance-based methods. Handle missing values.
+
+**2. Dimensionality reduction:** 200 correlated features is too many for direct modeling (curse of dimensionality, multicollinearity). Apply PCA to reduce to a manageable number of components (use scree plot to choose). Keep perhaps 10-20 components that capture 90%+ of variance.
+
+**3. Model selection:** You need both probability output AND interpretability:
+
+- **For probability:** Logistic regression on PCA components gives you a churn probability for each customer (bounded 0-1).
+- **For interpretability:** Build a single CART tree on the original (non-PCA) features. This gives you rules like "customers with usage < 5 hrs/week AND tenure < 6 months have 78% churn probability." The tree won't be as accurate as the logistic model, but it explains the "why."
+- **Optional:** Random forest for maximum prediction accuracy, if you only need aggregate variable importance (not individual explanations).
+
+**4. Validation:** Use 10-fold cross-validation to estimate real-world accuracy. Never evaluate on training data. Hold out a final test set that you touch only once.
+
+**5. Deployment decision:** Use the logistic/PCA model for automated scoring (who to target with retention offers). Use the CART tree for business stakeholder presentations (why customers leave).
+
+The key insight: you might use *multiple* models for different purposes. Prediction accuracy and interpretability often require different tools.
+:::
+
+---
+
+### F21. Explain: The Three Types of Analytics Questions
+
+A new data science hire asks "What kinds of questions can analytics answer?" Explain the three types with examples.
+
+::: {.callout-tip collapse="true" title="Hint"}
+Descriptive, predictive, prescriptive --- and they build on each other.
+:::
+
+::: {.callout-note collapse="true" title="Model Answer"}
+Analytics answers three types of questions, each building on the previous:
+
+**1. Descriptive --- "What happened?"**
+Looking backward at historical data. Examples: "What were last quarter's sales by region?" "Which products had the highest return rate?" Tools: dashboards, summary statistics, visualizations. This is the foundation --- you can't predict or prescribe without first understanding what happened.
+
+**2. Predictive --- "What will happen?"**
+Using patterns in historical data to forecast the future. Examples: "Which customers will churn next month?" (logistic regression) "What will Q3 revenue be?" (ARIMA, exponential smoothing) "Is this transaction fraudulent?" (SVM, CART). Most predictive modeling work sits here.
+
+**3. Prescriptive --- "What should we do?"**
+Recommending actions to achieve a desired outcome. Examples: "What price maximizes profit?" "Which patients should receive the expensive treatment?" "How should we allocate marketing budget across channels?" Tools: optimization, simulation, decision analysis. This is the hardest type and requires combining predictive models with business constraints and objectives.
+
+Each level requires the previous: you can't predict without descriptive understanding, and you can't prescribe without predictions. Most organizations are still working on moving from descriptive to predictive.
+:::
+
+---
+
+## Self-Assessment Scorecard
+
+Fill in your scores:
+
+| Section | MC Score | MC Total | Feynman Avg | Feynman Total |
+|---------|----------|----------|-------------|---------------|
+| 1. Classification | ___ | /4 | ___ | /3 |
+| 2. Validation & Clustering | ___ | /3 | ___ | /3 |
+| 3. Data Prep & Outliers | ___ | /3 | ___ | /2 |
+| 4. Change Detection | ___ | /3 | ___ | /2 |
+| 5. Time Series | ___ | /4 | ___ | /2 |
+| 6. Regression | ___ | /4 | ___ | /2 |
+| 7. Transformations & PCA | ___ | /3 | ___ | /2 |
+| 8. Trees & Forests | ___ | /5 | ___ | /3 |
+| 9. Cross-Module Integration | ___ | /4 | ___ | /2 |
+| **Totals** | ___ | **/33** | ___ | **/21** |
+
+**MC percentage:** ___ / 33 = ___%
+
+**Feynman average:** Total Feynman points / 21 = ___
+
+### Mastery Check
+
+- 80%+ MC AND Feynman avg $\geq$ 1.5 $\rightarrow$ **Analytics Ready (Level 3)**
+- 60-79% MC OR Feynman avg 1.0-1.4 $\rightarrow$ **Review weak areas below**
+- Below 60% MC OR Feynman avg < 1.0 $\rightarrow$ **Revisit the linked walkthroughs before retesting**
+
+## If You Scored Low...
+
+| Section | Review These Materials |
+|---------|----------------------|
+| 1. Classification | [SVM](svm-from-scratch.qmd), [KNN](knn-from-scratch.qmd) |
+| 2. Validation & Clustering | [Cross-Validation](cross-validation-from-scratch.qmd), [K-Means](kmeans-from-scratch.qmd) |
+| 3. Data Prep & Outliers | Review missingness and transformation ideas in [Missing Data](missing-data-from-scratch.qmd) and [PCA & Box-Cox](pca-boxcox-from-scratch.qmd) |
+| 4. Change Detection | [CUSUM](cusum-from-scratch.qmd) |
+| 5. Time Series | [Time Series](time-series-from-scratch.qmd) |
+| 6. Regression | [Regression](regression-from-scratch.qmd) |
+| 7. Transformations & PCA | [PCA & Box-Cox](pca-boxcox-from-scratch.qmd) |
+| 8. Trees & Forests | [CART](cart-from-scratch.qmd), [Advanced Topics](advanced-topics-from-scratch.qmd) |
+| 9. Cross-Module | Start at the [home page](index.qmd) and choose the topic by modeling goal |

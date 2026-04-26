@@ -1,0 +1,407 @@
+---
+title: "Optimization: Variables, Constraints, and the Art of Modeling"
+subtitle: "Linear programming, binary variables, and why the modeling matters more than the solver"
+engine: knitr
+---
+
+## The Prescriptive Turn
+
+Most of this guide so far has answered *what will happen?* Optimization answers *what should we do?* Given a goal, some constraints, and a set of decisions we control, what combination of decisions is best?
+
+Two uses of optimization to remember:
+
+1. **Top-level prescriptive analytics** — what should we invest in, how should we schedule workers, which route should the delivery truck take?
+2. **Underneath almost every model in this guide** — linear regression, LASSO, ridge, logistic regression, SVM, exponential smoothing, ARIMA, GARCH, k-means — all are optimization problems being solved to pick parameters.
+
+::: {.callout-tip}
+**The big insight:** software can *solve* optimization problems, but software cannot *formulate* them for you. The modeling is the hard part — and that makes it a competitive skill.
+:::
+
+---
+
+## The Three Pieces of Every Optimization Model
+
+| Piece | What it represents |
+|---|---|
+| **Variables** | The decisions the solver picks values for |
+| **Constraints** | The rules those decisions must obey |
+| **Objective function** | The single number we're maximizing or minimizing |
+
+A **solution** = a value for every variable. A **feasible solution** satisfies every constraint. The **optimal solution** is the feasible solution with the best objective value.
+
+::: {.callout-warning}
+**A useful language habit:** never say "more optimal" or "most optimal." It's like saying "more best." A solution is either optimal or it isn't.
+:::
+
+---
+
+## A Tiny LP: The Diet Problem
+
+The original problem that kicked off linear programming in the 1940s: feed soldiers at minimum cost subject to nutritional constraints. Here's a two-food, two-nutrient version.
+
+**Decision**: how much of each food to serve.
+- $x_1$ = servings of bread
+- $x_2$ = servings of cheese
+
+**Constraints**: need at least 8 g of protein and 10 g of carbs per meal.
+- Bread: 2 g protein, 4 g carbs per serving
+- Cheese: 5 g protein, 1 g carbs per serving
+
+**Objective**: minimize cost.
+- Bread: $0.20 / serving
+- Cheese: $0.50 / serving
+
+$$
+\begin{aligned}
+\text{minimize} \quad & 0.20 x_1 + 0.50 x_2 \\
+\text{subject to} \quad & 2 x_1 + 5 x_2 \ge 8 \quad (\text{protein}) \\
+& 4 x_1 + 1 x_2 \ge 10 \quad (\text{carbs}) \\
+& x_1, x_2 \ge 0
+\end{aligned}
+$$
+
+```{r}
+#| label: lp-solve
+#| echo: true
+
+library(lpSolve)
+
+# Objective: minimize 0.20 x1 + 0.50 x2
+objective <- c(0.20, 0.50)
+
+# Constraints: LHS coefficients, directions, RHS
+constraints <- matrix(c(
+  2, 5,   # protein
+  4, 1    # carbs
+), nrow = 2, byrow = TRUE)
+
+directions <- c(">=", ">=")
+rhs        <- c(8, 10)
+
+sol <- lp(direction    = "min",
+          objective.in = objective,
+          const.mat    = constraints,
+          const.dir    = directions,
+          const.rhs    = rhs)
+
+cat("Optimal cost:       $", round(sol$objval, 3), "\n")
+cat("Bread servings x1:  ", round(sol$solution[1], 3), "\n")
+cat("Cheese servings x2: ", round(sol$solution[2], 3), "\n")
+```
+
+### The Feasible Region — Seeing Why the Optimum Is at a Corner
+
+For two-variable LPs, we can draw the feasible region.
+
+```{r}
+#| label: fig-feasible
+#| fig-cap: "Feasible region for the diet LP. Each constraint cuts off a half-plane; the feasible set is their intersection. The optimum of a linear objective lives at a vertex of this region."
+#| fig-width: 7
+#| fig-height: 6
+#| echo: false
+
+par(mar = c(4, 4, 3, 1))
+plot(NULL, xlim = c(0, 6), ylim = c(0, 6),
+     xlab = expression(x[1] * " (bread)"),
+     ylab = expression(x[2] * " (cheese)"),
+     main = "Feasible region for the diet LP")
+abline(h = 0, v = 0, col = "gray85")
+grid()
+
+# Protein: 2 x1 + 5 x2 = 8  ->  x2 = (8 - 2 x1) / 5
+x1_seq <- seq(0, 6, length.out = 200)
+lines(x1_seq, (8 - 2 * x1_seq) / 5, col = "#d62828", lwd = 2)
+text(5.3, (8 - 2 * 5.3) / 5 - 0.25, "protein", col = "#d62828", cex = 0.9)
+
+# Carbs:   4 x1 + 1 x2 = 10 ->  x2 = 10 - 4 x1
+lines(x1_seq, 10 - 4 * x1_seq, col = "#1f4e79", lwd = 2)
+text(1.1, 10 - 4 * 1.1 + 0.3, "carbs", col = "#1f4e79", cex = 0.9)
+
+# Shade feasible region (above both lines and in the positive quadrant)
+grid_points <- expand.grid(x1 = seq(0, 6, 0.05), x2 = seq(0, 6, 0.05))
+feasible <- with(grid_points,
+                 2 * x1 + 5 * x2 >= 8 &
+                 4 * x1 + 1 * x2 >= 10 &
+                 x1 >= 0 & x2 >= 0)
+points(grid_points[feasible, ], col = adjustcolor("#2d6a4f", 0.15),
+       pch = 15, cex = 0.4)
+
+# Mark the optimal solution
+points(sol$solution[1], sol$solution[2], pch = 19, col = "#6c00a3", cex = 1.8)
+text(sol$solution[1] + 0.2, sol$solution[2] + 0.3,
+     sprintf("optimum\n(%.2f, %.2f)", sol$solution[1], sol$solution[2]),
+     col = "#6c00a3", cex = 0.85, adj = 0)
+
+# Show one iso-cost line at the optimum for the direction
+iso_level <- sol$objval
+lines(x1_seq, (iso_level - 0.20 * x1_seq) / 0.50,
+      col = "gray40", lty = 3)
+text(4.8, (iso_level - 0.20 * 4.8) / 0.50 + 0.2,
+     "iso-cost line", col = "gray40", cex = 0.8)
+
+legend("topright",
+       legend = c("protein constraint", "carbs constraint",
+                  "feasible region", "optimum"),
+       col = c("#d62828", "#1f4e79",
+               adjustcolor("#2d6a4f", 0.4), "#6c00a3"),
+       lty = c(1, 1, NA, NA), pch = c(NA, NA, 15, 19),
+       lwd = c(2, 2, NA, NA), bty = "n", cex = 0.85)
+```
+
+::: {.callout-note}
+**Check your understanding:** Why does the optimum of an LP always sit at a vertex of the feasible region?
+
+*Answer: because the objective is linear. Moving along any edge changes the objective monotonically — you can always improve by going to a vertex. That's the entire idea behind the simplex algorithm, which walks from vertex to vertex until no neighbor improves the objective.*
+:::
+
+---
+
+## The Variable-Choice Trap: Call Center Scheduling
+
+Picking the right variables matters more than the algebra. The canonical scheduling warning is a call center that needs $d_i$ workers on day $i$ of the week and wants everyone to work 5 consecutive days before 2 off.
+
+**"Obvious" variables** — $x_i$ = number of workers on day $i$:
+- Objective ($\sum x_i$) and demand ($x_i \ge d_i$) are trivial to write.
+- The 5-consecutive-days rule is *nearly impossible* to express.
+
+**Correct variables** — $x_i$ = number of workers who *start* their 5-day stretch on day $i$:
+- Objective becomes $5 \sum x_i$.
+- Tuesday demand is $x_{\text{Fri}} + x_{\text{Sat}} + x_{\text{Sun}} + x_{\text{Mon}} + x_{\text{Tue}} \ge d_{\text{Tue}}$.
+- The 5-in-a-row rule is *built into the variable definition* — zero extra constraints needed.
+
+Let's solve it.
+
+```{r}
+#| label: call-center
+#| echo: true
+
+days <- c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+
+# Demand forecast
+demand <- c(Mon = 17, Tue = 13, Wed = 15, Thu = 19, Fri = 14, Sat = 16, Sun = 11)
+
+# Variables: x[i] = workers starting their 5-day stretch on day i
+# Each x[i] covers 5 consecutive days starting at i (wrapping around the week)
+
+# Build the coverage matrix: rows = days of demand, cols = start days
+n_days <- 7
+coverage <- matrix(0, nrow = n_days, ncol = n_days)
+for (start in 1:n_days) {
+  covered <- ((start - 1) + 0:4) %% n_days + 1
+  coverage[covered, start] <- 1
+}
+dimnames(coverage) <- list(day_of_demand = days, start_day = days)
+coverage
+
+# Solve: minimize sum of workers hired, subject to coverage >= demand
+lp_sched <- lp(
+  direction    = "min",
+  objective.in = rep(1, n_days),
+  const.mat    = coverage,
+  const.dir    = rep(">=", n_days),
+  const.rhs    = demand,
+  all.int      = TRUE
+)
+
+cat("Total workers needed:", lp_sched$objval, "\n\n")
+cat("Workers starting each day:\n")
+schedule <- setNames(lp_sched$solution, days)
+print(schedule)
+
+cat("\nCoverage per day (must be >= demand):\n")
+coverage_actual <- as.vector(coverage %*% lp_sched$solution)
+print(setNames(coverage_actual, days))
+```
+
+::: {.callout-warning}
+**Common pitfall:** optimization is as much about *problem formulation* as about solving. The same problem, written with the wrong variables, can become intractable. Whenever a constraint feels awkward to write, consider whether a different variable definition would make it disappear.
+:::
+
+---
+
+## Binary Variables: Fixed Charges and Logical Rules
+
+Introducing $y_i \in \{0, 1\}$ (1 if we invest in stock $i$, 0 otherwise) lets us model *real* constraints that are impossible with continuous variables alone.
+
+### Fixed charges (transaction fees)
+
+If buying any amount of a stock costs a flat transaction fee $t$, add $\sum_i t \cdot y_i$ to the objective, and link: $x_i \le B \cdot y_i$ (if not buying, must be zero; if buying, up to budget $B$).
+
+### Minimum investment size
+
+$x_i \ge m_i \cdot y_i$ — can't put $3 into Google because one share is hundreds.
+
+### Logical rules
+
+| Rule | Constraint |
+|---|---|
+| Must invest in Tesla | $y_{\text{TSLA}} = 1$ |
+| Invest in at least one of {A, G, AP} | $y_A + y_G + y_{AP} \ge 1$ |
+| Exactly one of them | $y_A + y_G + y_{AP} = 1$ |
+| FedEx and UPS together or neither | $y_{\text{FDX}} = y_{\text{UPS}}$ |
+| Coke and Pepsi opposite decisions | $y_{\text{KO}} = 1 - y_{\text{PEP}}$ |
+
+Let's solve a small portfolio problem that uses some of these.
+
+```{r}
+#| label: portfolio-binary
+#| echo: true
+
+stocks <- c("TSLA", "AMZN", "GOOG", "AAPL", "FDX", "UPS")
+returns <- c(0.18, 0.15, 0.12, 0.14, 0.09, 0.08)  # expected return (decimal)
+budget <- 100000
+min_invest <- 5000      # can't invest less than $5k per stock
+txn_fee <- 150           # fixed fee per stock we pick
+
+# Decision variables: x1..x6 (dollars in each) then y1..y6 (binary pick)
+# Maximize: sum(returns * x) - sum(txn_fee * y)
+# Equivalently: minimize -(sum(returns * x) - sum(txn_fee * y))
+n <- length(stocks)
+objective <- c(-returns, rep(txn_fee, n))  # minimize
+
+# Constraints:
+# 1. Budget:              sum(x_i) <= budget
+# 2. Linking (upper):     x_i - budget * y_i <= 0    for each i
+# 3. Linking (lower min): x_i - min_invest * y_i >= 0 for each i
+# 4. At least one of {AMZN, GOOG, AAPL}: y_AMZN + y_GOOG + y_AAPL >= 1
+# 5. FedEx/UPS both or neither: y_FDX - y_UPS = 0
+
+# Budget row
+A <- rbind(c(rep(1, n), rep(0, n)))
+dir <- c("<=")
+rhs <- c(budget)
+
+# Linking constraints
+for (i in 1:n) {
+  row_upper <- rep(0, 2 * n)
+  row_upper[i] <- 1
+  row_upper[n + i] <- -budget
+  A <- rbind(A, row_upper); dir <- c(dir, "<="); rhs <- c(rhs, 0)
+
+  row_lower <- rep(0, 2 * n)
+  row_lower[i] <- 1
+  row_lower[n + i] <- -min_invest
+  A <- rbind(A, row_lower); dir <- c(dir, ">="); rhs <- c(rhs, 0)
+}
+
+# At least one of AMZN (2), GOOG (3), AAPL (4)
+one_of <- rep(0, 2 * n)
+one_of[n + 2] <- 1; one_of[n + 3] <- 1; one_of[n + 4] <- 1
+A <- rbind(A, one_of); dir <- c(dir, ">="); rhs <- c(rhs, 1)
+
+# FDX (5) == UPS (6)
+both_or_neither <- rep(0, 2 * n)
+both_or_neither[n + 5] <- 1
+both_or_neither[n + 6] <- -1
+A <- rbind(A, both_or_neither); dir <- c(dir, "="); rhs <- c(rhs, 0)
+
+sol_port <- lp(
+  direction    = "min",
+  objective.in = objective,
+  const.mat    = A,
+  const.dir    = dir,
+  const.rhs    = rhs,
+  int.vec      = (n + 1):(2 * n),          # y_i are integer
+  binary.vec   = (n + 1):(2 * n)           # and binary
+)
+
+x_vals <- sol_port$solution[1:n]
+y_vals <- sol_port$solution[(n + 1):(2 * n)]
+
+portfolio <- data.frame(
+  stock    = stocks,
+  picked   = as.logical(y_vals),
+  invested = round(x_vals, 0),
+  expected_return = round(x_vals * returns, 0)
+)
+portfolio
+
+cat("\nTotal invested: $", sum(x_vals), "\n")
+cat("Expected return net of fees: $",
+    round(sum(x_vals * returns) - sum(y_vals * txn_fee), 0), "\n")
+```
+
+The solver picks the best set, respects the minimum-investment rule, includes at least one of {AMZN, GOOG, AAPL}, and treats FedEx/UPS as a matched pair.
+
+---
+
+## The Problem-Type Hierarchy (Easiest → Hardest)
+
+| Type | Notes |
+|---|---|
+| **Linear Program (LP)** | Millions of variables, fast. What we've been doing. |
+| **Convex Quadratic Program (QP)** | Fast. Portfolio optimization, ridge regression. |
+| **Convex Optimization (general)** | Still "easy" in theory, can be slow. |
+| **Integer Program (IP)** | Hard. Some small IPs don't have known optimal solutions even after days of compute. |
+| **General Non-Convex** | Brutal. Even tiny problems may be intractable. |
+| **Network Optimization** | *Faster* than LP. Shortest path, assignment, max flow. |
+
+::: {.callout-tip}
+**Recognizing the type matters.** A problem written as an IP may be intractable, but the same problem re-formulated as a network-flow problem can solve in milliseconds. This is why modeling ability matters more than knowing how to call a solver.
+:::
+
+---
+
+## Handling Uncertainty — Four Approaches
+
+When input data is uncertain (demand forecasts, returns, transition rates), the deterministic optimum can be catastrophically bad. Four approaches:
+
+| Approach | Idea |
+|---|---|
+| **Conservative constraints** | Pad the RHS: require demand + $\theta$ extra buffer. |
+| **Chance constraints** | $P(\text{demand met}) \ge p$. Needs a distribution estimate. |
+| **Scenario optimization** | Define multiple scenarios, solve for a *robust* solution (feasible in all) or minimize expected cost across them. |
+| **Stochastic dynamic programming / Markov Decision Processes** | Model the system as states + decisions + transition probabilities and find the best policy via Bellman's equation. |
+
+Scenario optimization in particular is very flexible — you can represent a messy probabilistic world as a discrete set of "what-ifs" and let the solver pick a policy that works across them.
+
+---
+
+## Regression as Optimization — The Terminology Collision
+
+Every regression, LASSO, ridge, logistic regression, SVM, exponential-smoothing, ARIMA, GARCH, and k-means model discussed in this guide is really an optimization problem inside. The confusing bit is terminology: statisticians call the data $x_{ij}$ "variables" (they vary across rows); optimizers call the coefficients $a_0, a_1, \ldots$ "variables" (they're what the solver picks).
+
+Let's solve linear regression explicitly as optimization to drive the point home.
+
+```{r}
+#| label: regression-as-optim
+#| echo: true
+
+set.seed(42)
+n <- 60
+x <- runif(n, 0, 10)
+y <- 2 + 1.5 * x + rnorm(n, 0, 1)
+
+# Standard lm
+fit_lm <- lm(y ~ x)
+cat("lm() intercept =",    round(coef(fit_lm)[1], 4),
+    "   slope =",          round(coef(fit_lm)[2], 4), "\n")
+
+# As an optimization problem: minimize sum((y - a0 - a1*x)^2) over (a0, a1)
+sse <- function(params) {
+  a0 <- params[1]; a1 <- params[2]
+  sum((y - a0 - a1 * x)^2)
+}
+
+fit_optim <- optim(par = c(0, 0), fn = sse, method = "BFGS")
+cat("optim() intercept =", round(fit_optim$par[1], 4),
+    "   slope =",          round(fit_optim$par[2], 4), "\n")
+```
+
+Same answer. The `optim()` version is doing what `lm()` does under the hood — it just exposes the optimization nature. And because it's an optimization problem, we can *customize* it: force the intercept to zero, constrain coefficients to be monotone, use $|y - \hat{y}|^{1.5}$ instead of squared error, etc. Standard regression packages can't do that; optimization solvers can.
+
+---
+
+## Cheat Sheet
+
+::: {.callout-warning}
+**Common pitfalls recap:**
+
+1. **"More optimal" is not a thing.** A solution is optimal or it isn't.
+2. **Problem formulation > solver choice.** The call-center example is the canonical illustration.
+3. **Link the variables.** Solvers only see math, not your English intent. $\sum_d v_{id} = y_i$ may be invisible to the solver if you don't write it.
+4. **LP optima live at vertices.** That's why simplex works.
+5. **Binary variables make IPs hard.** Don't default to "$y \in \{0, 1\}$" without considering whether an LP or network formulation would do.
+6. **Regression is optimization in disguise.** So are LASSO, SVM, exponential smoothing, and k-means. Knowing this lets you customize them.
+7. **Statisticians and optimizers mean different things by "variable."** Always check which hat the person is wearing.
+:::

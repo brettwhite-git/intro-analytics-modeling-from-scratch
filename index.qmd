@@ -1,0 +1,114 @@
+---
+title: "Analytics Modeling From Scratch"
+subtitle: "Formula-first walkthroughs for building intuition, code, and judgment"
+engine: knitr
+format:
+  html:
+    css: styles.css
+---
+
+Every walkthrough builds a modeling idea from the ground up. You see the
+question the method answers, the formula it relies on, the R code that makes it
+concrete, and the judgment calls that matter when the math meets messy data.
+
+## Choose by Goal
+
+| If you need to... | Start with... | Core idea |
+|---|---|---|
+| Classify observations into known groups | [SVM](svm-from-scratch.qmd) or [KNN](knn-from-scratch.qmd) | Boundaries vs. neighbors |
+| Evaluate model performance or avoid overfitting | [Cross-Validation](cross-validation-from-scratch.qmd) | Test on data the model did not see |
+| Group unlabeled observations | [K-Means](kmeans-from-scratch.qmd) | Clusters from distance and centroids |
+| Detect a shift in process data | [CUSUM](cusum-from-scratch.qmd) | Accumulated evidence of change |
+| Forecast future values | [Time Series](time-series-from-scratch.qmd) | Trend, memory, and volatility |
+| Predict or explain outcomes | [Regression](regression-from-scratch.qmd) | Linear and logistic relationships |
+| Transform skewed data or reduce dimensions | [PCA & Box-Cox](pca-boxcox-from-scratch.qmd) | Better feature geometry |
+| Make interpretable if-then rules | [CART](cart-from-scratch.qmd) | Recursive splits and pruning |
+| Choose which variables belong in a model | [Variable Selection](variable-selection-from-scratch.qmd) | Bias, variance, shrinkage |
+| Design data collection intentionally | [Design of Experiments](doe-from-scratch.qmd) | A/B tests, factorials, bandits |
+| Simulate uncertain systems | [Simulation & Markov](simulation-markov-from-scratch.qmd) | Distributions, queues, steady states |
+| Handle missing values | [Missing Data](missing-data-from-scratch.qmd) | Missingness mechanisms and imputation |
+| Formulate resource decisions | [Optimization](optimization-from-scratch.qmd) | Variables, constraints, objectives |
+| Recognize advanced modeling families | [Advanced Topics](advanced-topics-from-scratch.qmd) | A practical vocabulary tour |
+
+## Topic Map
+
+::: {.grid}
+
+::: {.g-col-12 .g-col-md-6}
+### Classification
+- [**SVM From Scratch**](svm-from-scratch.qmd) — Maximum-margin hyperplanes and the kernel trick
+- [**KNN From Scratch**](knn-from-scratch.qmd) — Majority vote among nearest neighbors
+:::
+
+::: {.g-col-12 .g-col-md-6}
+### Validation
+- [**Cross-Validation From Scratch**](cross-validation-from-scratch.qmd) — Why testing on training data is cheating
+:::
+
+::: {.g-col-12 .g-col-md-6}
+### Clustering
+- [**K-Means From Scratch**](kmeans-from-scratch.qmd) — Finding groups nobody told you about
+:::
+
+::: {.g-col-12 .g-col-md-6}
+### Change Detection
+- [**CUSUM From Scratch**](cusum-from-scratch.qmd) — Catching the moment everything changed
+:::
+
+::: {.g-col-12 .g-col-md-6}
+### Time Series
+- [**Time Series From Scratch**](time-series-from-scratch.qmd) — Exponential smoothing, ARIMA, GARCH
+:::
+
+::: {.g-col-12 .g-col-md-6}
+### Regression
+- [**Regression From Scratch**](regression-from-scratch.qmd) — Linear & logistic regression
+:::
+
+::: {.g-col-12 .g-col-md-6}
+### Transformations
+- [**PCA & Box-Cox From Scratch**](pca-boxcox-from-scratch.qmd) — Fixing your data before modeling
+:::
+
+::: {.g-col-12 .g-col-md-6}
+### Trees
+- [**CART From Scratch**](cart-from-scratch.qmd) — If-then rules that think like humans
+:::
+
+::: {.g-col-12 .g-col-md-6}
+### Variable Selection
+- [**Variable Selection From Scratch**](variable-selection-from-scratch.qmd) — LASSO, ridge, stepwise, and bias-variance tradeoff
+:::
+
+::: {.g-col-12 .g-col-md-6}
+### Design of Experiments
+- [**DOE From Scratch**](doe-from-scratch.qmd) — A/B testing, factorial designs, multi-armed bandits
+:::
+
+::: {.g-col-12 .g-col-md-6}
+### Simulation & Markov
+- [**Simulation & Markov From Scratch**](simulation-markov-from-scratch.qmd) — Distributions, QQ plots, M/M/1 queues, steady states
+:::
+
+::: {.g-col-12 .g-col-md-6}
+### Missing Data
+- [**Missing Data From Scratch**](missing-data-from-scratch.qmd) — MCAR/MAR/MNAR, indicators, imputation strategies
+:::
+
+::: {.g-col-12 .g-col-md-6}
+### Optimization
+- [**Optimization From Scratch**](optimization-from-scratch.qmd) — LP, binary variables, and why formulation is the hard part
+:::
+
+::: {.g-col-12 .g-col-md-6}
+### Advanced Topics
+- [**Advanced Topics From Scratch**](advanced-topics-from-scratch.qmd) — Nonparametric, Bayesian, neural nets, game theory, survival, gradient boosting
+:::
+
+:::
+
+## Featured Practice
+
+- [**Comprehensive Quiz**](comprehensive-quiz.qmd) - mixed concept checks with short explanations.
+- [**Binary Choice Drill**](binary-choice-drill.qmd) - precise true/false-style statements for fast recall.
+- [**Confusion Matrix Cost Drill**](confusion-matrix-drill.qmd) - calculate decision costs from false positives and false negatives.

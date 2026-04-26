@@ -1,0 +1,213 @@
+---
+title: "Confusion Matrix Cost Drill"
+subtitle: "Compute actual costs - don't guess | Binary choice practice"
+engine: knitr
+---
+
+## Instructions
+
+A practice prompt gives you confusion matrices and a cost structure, then asks
+which model or threshold is cheaper. Plug in the actual numbers and compute
+before you choose.
+
+**Format:** IS / IS NOT fill-in-blank. Click the collapsed callout to reveal
+each answer after you've committed.
+
+**Key formula:** Total Cost = (# False Positives × Cost_FP) + (# False Negatives × Cost_FN)
+
+---
+
+## Scenario 1: Medical Screening
+
+A hospital builds a classifier to detect a rare disease in blood samples.
+
+**Confusion Matrix (Model A, threshold = 0.5):**
+
+|  | Predicted Positive | Predicted Negative |
+|--|-------------------|-------------------|
+| Actually Positive | 42 (TP) | 8 (FN) |
+| Actually Negative | 35 (FP) | 115 (TN) |
+
+**Confusion Matrix (Model B, threshold = 0.3):**
+
+|  | Predicted Positive | Predicted Negative |
+|--|-------------------|-------------------|
+| Actually Positive | 48 (TP) | 2 (FN) |
+| Actually Negative | 62 (FP) | 88 (TN) |
+
+**Costs:** Missing a disease case (FN) costs \$50,000 in delayed treatment. A false alarm (FP) costs \$500 in unnecessary follow-up testing.
+
+### Q1
+
+Model A's total cost \_\_\_\_\_ (**IS / IS NOT**) lower than Model B's total cost.
+
+::: {.callout-note collapse="true" title="Answer"}
+**IS NOT.**
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show computation"
+cost_FP <- 500
+cost_FN <- 50000
+
+# Model A
+A_FP <- 35; A_FN <- 8
+cost_A <- A_FP * cost_FP + A_FN * cost_FN
+cat("Model A:", A_FP, "FP ×", cost_FP, "+", A_FN, "FN ×", cost_FN, "=", cost_A, "\n")
+
+# Model B
+B_FP <- 62; B_FN <- 2
+cost_B <- B_FP * cost_FP + B_FN * cost_FN
+cat("Model B:", B_FP, "FP ×", cost_FP, "+", B_FN, "FN ×", cost_FN, "=", cost_B, "\n")
+
+cat("\nModel A costs $", format(cost_A, big.mark=","),
+    "\nModel B costs $", format(cost_B, big.mark=","),
+    "\nModel B is cheaper by $", format(cost_A - cost_B, big.mark=","))
+```
+
+Model A: $417,500. Model B: $131,000. Model B is far cheaper despite having nearly twice as many false positives, because each missed disease case is 100× more expensive than a false alarm.
+:::
+
+---
+
+### Q2
+
+Model A \_\_\_\_\_ (**DOES / DOES NOT**) have higher overall accuracy than Model B.
+
+::: {.callout-note collapse="true" title="Answer"}
+**DOES.**
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show computation"
+acc_A <- (42 + 115) / 200
+acc_B <- (48 + 88) / 200
+cat("Model A accuracy:", acc_A, "\nModel B accuracy:", acc_B)
+```
+
+Model A: 78.5% accuracy. Model B: 68.0% accuracy. Model A is more accurate but MORE EXPENSIVE. This is the key lesson: accuracy ≠ cost-effectiveness when costs are asymmetric.
+:::
+
+---
+
+### Q3
+
+If both error types cost the same (\$500 each), the cheaper model \_\_\_\_\_ (**WOULD / WOULD NOT**) change.
+
+::: {.callout-note collapse="true" title="Answer"}
+**WOULD.**
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show computation"
+cost_sym <- 500
+cost_A_sym <- 35 * cost_sym + 8 * cost_sym
+cost_B_sym <- 62 * cost_sym + 2 * cost_sym
+cat("Symmetric costs:\n")
+cat("Model A:", 35, "FP +", 8, "FN =", 43, "errors × $500 = $", format(cost_A_sym, big.mark=","), "\n")
+cat("Model B:", 62, "FP +", 2, "FN =", 64, "errors × $500 = $", format(cost_B_sym, big.mark=","), "\n")
+cat("\nWith symmetric costs, Model A is cheaper (fewer total errors)")
+```
+
+With symmetric costs, Model A ($21,500) beats Model B ($32,000). The cost structure determines the optimal model.
+:::
+
+---
+
+## Scenario 2: Three Threshold Comparison
+
+A retailer predicts which products will sell out. Three probability thresholds:
+
+**p = 0.3:**
+
+|  | Predicted: Restock | Predicted: Skip |
+|--|--------------------|----------------|
+| Actually sold out | 88 | 12 |
+| Actually didn't | 55 | 45 |
+
+**p = 0.5:**
+
+|  | Predicted: Restock | Predicted: Skip |
+|--|--------------------|----------------|
+| Actually sold out | 71 | 29 |
+| Actually didn't | 22 | 78 |
+
+**p = 0.7:**
+
+|  | Predicted: Restock | Predicted: Skip |
+|--|--------------------|----------------|
+| Actually sold out | 45 | 55 |
+| Actually didn't | 5 | 95 |
+
+**Costs:** Unnecessary restock (FP) = \$100. Missed sellout (FN) = \$400 in lost revenue.
+
+### Q4
+
+The threshold with the lowest total cost \_\_\_\_\_ (**IS / IS NOT**) $p = 0.5$.
+
+::: {.callout-note collapse="true" title="Answer"}
+**IS NOT.** Compute the actual costs:
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show computation"
+cost_FP <- 100; cost_FN <- 400
+
+scenarios <- data.frame(
+  threshold = c(0.3, 0.5, 0.7),
+  FP = c(55, 22, 5),
+  FN = c(12, 29, 55)
+)
+scenarios$total_cost <- scenarios$FP * cost_FP + scenarios$FN * cost_FN
+scenarios$cost_label <- paste0("$", format(scenarios$total_cost, big.mark=","))
+
+print(scenarios)
+cat("\np = 0.3 has the lowest total cost at $", format(scenarios$total_cost[1], big.mark=","))
+```
+
+- p=0.3: 55×\$100 + 12×\$400 = \$5,500 + \$4,800 = **\$10,300**
+- p=0.5: 22×\$100 + 29×\$400 = \$2,200 + \$11,600 = **\$13,800**
+- p=0.7: 5×\$100 + 55×\$400 = \$500 + \$22,000 = **\$22,500**
+
+$p = 0.3$ is cheapest at \$10,300 — not p=0.5. The lower threshold has more unnecessary restocks (55 vs 22), but each missed sellout costs 4× as much (\$400 vs \$100), so catching sellouts aggressively wins. Don't assume the middle threshold is always best — compute.
+:::
+
+---
+
+### Q5
+
+If the cost of a missed sellout DOUBLED to \$800, the optimal threshold \_\_\_\_\_ (**WOULD / WOULD NOT**) likely shift toward a LOWER threshold.
+
+::: {.callout-note collapse="true" title="Answer"}
+**WOULD.**
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show computation"
+cost_FP <- 100; cost_FN <- 800
+
+cat("With FN cost = $800:\n")
+cat("p=0.3:", 55*cost_FP + 12*cost_FN, "\n")
+cat("p=0.5:", 22*cost_FP + 29*cost_FN, "\n")
+cat("p=0.7:", 5*cost_FP + 55*cost_FN, "\n")
+```
+
+Higher FN cost → want to avoid missing sellouts → predict "restock" more aggressively → lower threshold. p=0.3 becomes even more dominant.
+:::
+
+---
+
+## Scenario 3: Build Your Own
+
+Given any confusion matrix and cost structure, the computation is always:
+
+$$\text{Total Cost} = (\text{FP} \times C_{FP}) + (\text{FN} \times C_{FN})$$
+
+**Practice habit:** When you see a confusion matrix, immediately:
+
+1. Identify FP and FN counts
+2. Multiply each by its cost
+3. Sum for total cost
+4. Compare across options
+
+Never skip the computation. The habit is simple: compute first, then choose.
