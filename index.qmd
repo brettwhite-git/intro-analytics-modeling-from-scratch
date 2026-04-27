@@ -11,26 +11,179 @@ Every walkthrough builds a modeling idea from the ground up. You see the
 question the method answers, the formula it relies on, the R code that makes it
 concrete, and the judgment calls that matter when the math meets messy data.
 
+::: {.home-actions}
+[Start with a goal](#choose-by-goal){.action-button .primary}
+[Practice drills](#featured-practice){.action-button}
+[Core demos](#topic-map){.action-button}
+:::
+
+::: {.home-snapshot}
+::: {.snapshot-item}
+**18**
+walkthroughs and drills
+:::
+
+::: {.snapshot-item}
+**R-first**
+worked examples
+:::
+
+::: {.snapshot-item}
+**Formula + code**
+side by side
+:::
+:::
+
 ## Choose by Goal
 
-| If you need to... | Start with... | Core idea |
-|---|---|---|
-| Classify observations into known groups | [SVM](svm-from-scratch.qmd) or [KNN](knn-from-scratch.qmd) | Boundaries vs. neighbors |
-| Evaluate model performance or avoid overfitting | [Cross-Validation](cross-validation-from-scratch.qmd) | Test on data the model did not see |
-| Group unlabeled observations | [K-Means](kmeans-from-scratch.qmd) | Clusters from distance and centroids |
-| Detect a shift in process data | [CUSUM](cusum-from-scratch.qmd) | Accumulated evidence of change |
-| Forecast future values | [Time Series](time-series-from-scratch.qmd) | Trend, memory, and volatility |
-| Predict or explain outcomes | [Regression](regression-from-scratch.qmd) | Linear and logistic relationships |
-| Transform skewed data or reduce dimensions | [PCA & Box-Cox](pca-boxcox-from-scratch.qmd) | Better feature geometry |
-| Make interpretable if-then rules | [CART](cart-from-scratch.qmd) | Recursive splits and pruning |
-| Choose which variables belong in a model | [Variable Selection](variable-selection-from-scratch.qmd) | Bias, variance, shrinkage |
-| Design data collection intentionally | [Design of Experiments](doe-from-scratch.qmd) | A/B tests, factorials, bandits |
-| Simulate uncertain systems | [Simulation & Markov](simulation-markov-from-scratch.qmd) | Distributions, queues, steady states |
-| Handle missing values | [Missing Data](missing-data-from-scratch.qmd) | Missingness mechanisms and imputation |
-| Formulate resource decisions | [Optimization](optimization-from-scratch.qmd) | Variables, constraints, objectives |
-| Recognize advanced modeling families | [Advanced Topics](advanced-topics-from-scratch.qmd) | A practical vocabulary tour |
+Pick the job you are trying to do, then jump straight into the walkthrough that matches the modeling problem.
+
+::: {.route-grid}
+::: {.route-card}
+**Classify observations**
+
+Known labels, decision boundaries, and neighbor votes.
+
+::: {.route-links}
+[SVM](svm-from-scratch.qmd){.route-link}
+[KNN](knn-from-scratch.qmd){.route-link}
+:::
+:::
+
+::: {.route-card}
+**Check model performance**
+
+Estimate how well a model handles data it did not see while training.
+
+::: {.route-links}
+[Cross-Validation](cross-validation-from-scratch.qmd){.route-link}
+:::
+:::
+
+::: {.route-card}
+**Group unlabeled data**
+
+Find structure from distances, centroids, and repeated assignment.
+
+::: {.route-links}
+[K-Means](kmeans-from-scratch.qmd){.route-link}
+:::
+:::
+
+::: {.route-card}
+**Detect process shifts**
+
+Accumulate evidence until a small change becomes visible.
+
+::: {.route-links}
+[CUSUM](cusum-from-scratch.qmd){.route-link}
+:::
+:::
+
+::: {.route-card}
+**Forecast future values**
+
+Work through trend, memory, and volatility in ordered data.
+
+::: {.route-links}
+[Time Series](time-series-from-scratch.qmd){.route-link}
+:::
+:::
+
+::: {.route-card}
+**Predict or explain outcomes**
+
+Connect variables to outcomes with linear and logistic relationships.
+
+::: {.route-links}
+[Regression](regression-from-scratch.qmd){.route-link}
+:::
+:::
+
+::: {.route-card}
+**Transform features**
+
+Reduce dimensions or reshape skewed variables before modeling.
+
+::: {.route-links}
+[PCA & Box-Cox](pca-boxcox-from-scratch.qmd){.route-link}
+:::
+:::
+
+::: {.route-card}
+**Build interpretable rules**
+
+Create decision paths from recursive splits and pruning.
+
+::: {.route-links}
+[CART](cart-from-scratch.qmd){.route-link}
+:::
+:::
+
+::: {.route-card}
+**Choose variables**
+
+Balance signal, bias, variance, and shrinkage.
+
+::: {.route-links}
+[Variable Selection](variable-selection-from-scratch.qmd){.route-link}
+:::
+:::
+
+::: {.route-card}
+**Design data collection**
+
+Compare treatments intentionally with tests, factors, and adaptive choices.
+
+::: {.route-links}
+[Design of Experiments](doe-from-scratch.qmd){.route-link}
+:::
+:::
+
+::: {.route-card}
+**Simulate uncertainty**
+
+Model queues, distributions, and steady-state behavior.
+
+::: {.route-links}
+[Simulation & Markov](simulation-markov-from-scratch.qmd){.route-link}
+:::
+:::
+
+::: {.route-card}
+**Handle missing values**
+
+Reason about missingness mechanisms before choosing an imputation strategy.
+
+::: {.route-links}
+[Missing Data](missing-data-from-scratch.qmd){.route-link}
+:::
+:::
+
+::: {.route-card}
+**Formulate decisions**
+
+Turn objectives, constraints, and variables into solvable models.
+
+::: {.route-links}
+[Optimization](optimization-from-scratch.qmd){.route-link}
+:::
+:::
+
+::: {.route-card}
+**Recognize advanced families**
+
+Build a practical map of methods you will see beyond the basics.
+
+::: {.route-links}
+[Advanced Topics](advanced-topics-from-scratch.qmd){.route-link}
+:::
+:::
+:::
 
 ## Topic Map
+
+Use the full topic map when you want the complete formula-first walkthrough for a method.
 
 ::: {.grid}
 
@@ -109,6 +262,28 @@ concrete, and the judgment calls that matter when the math meets messy data.
 
 ## Featured Practice
 
-- [**Comprehensive Quiz**](comprehensive-quiz.qmd) - mixed concept checks with short explanations.
-- [**Binary Choice Drill**](binary-choice-drill.qmd) - precise true/false-style statements for fast recall.
-- [**Confusion Matrix Cost Drill**](confusion-matrix-drill.qmd) - calculate decision costs from false positives and false negatives.
+::: {.practice-strip}
+::: {.practice-card}
+**Comprehensive Quiz**
+
+Mixed concept checks with short explanations.
+
+[Open quiz](comprehensive-quiz.qmd){.route-link}
+:::
+
+::: {.practice-card}
+**Binary Choice Drill**
+
+Precise true/false-style statements for fast recall.
+
+[Start drill](binary-choice-drill.qmd){.route-link}
+:::
+
+::: {.practice-card}
+**Confusion Matrix Cost Drill**
+
+Calculate decision costs from false positives and false negatives.
+
+[Practice costs](confusion-matrix-drill.qmd){.route-link}
+:::
+:::

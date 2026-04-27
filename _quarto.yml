@@ -7,61 +7,88 @@ project:
 website:
   title: "Analytics Modeling From Scratch"
   description: "Step-by-step analytics modeling walkthroughs for learners who want the formulas, code, and intuition together."
-  search: true
+  site-url: "https://brettwhite-git.github.io/intro-analytics-modeling-from-scratch/"
+  repo-url: "https://github.com/brettwhite-git/intro-analytics-modeling-from-scratch"
+  search:
+    location: navbar
+    type: textbox
+  navbar:
+    title: "Analytics Modeling"
+    pinned: true
   sidebar:
     style: docked
+    title: "Demo Library"
+    collapse-level: 1
     contents:
       - text: "Home"
         icon: house-door
         href: index.qmd
       - section: "Classification"
         contents:
-          - svm-from-scratch.qmd
-          - knn-from-scratch.qmd
+          - text: "SVM"
+            href: svm-from-scratch.qmd
+          - text: "KNN"
+            href: knn-from-scratch.qmd
       - section: "Validation"
         contents:
-          - cross-validation-from-scratch.qmd
+          - text: "Cross-Validation"
+            href: cross-validation-from-scratch.qmd
       - section: "Clustering"
         contents:
-          - kmeans-from-scratch.qmd
+          - text: "K-Means"
+            href: kmeans-from-scratch.qmd
       - section: "Change Detection"
         contents:
-          - cusum-from-scratch.qmd
+          - text: "CUSUM"
+            href: cusum-from-scratch.qmd
       - section: "Time Series"
         contents:
-          - time-series-from-scratch.qmd
+          - text: "Time Series"
+            href: time-series-from-scratch.qmd
       - section: "Regression"
         contents:
-          - regression-from-scratch.qmd
+          - text: "Regression"
+            href: regression-from-scratch.qmd
       - section: "Transformations"
         contents:
-          - pca-boxcox-from-scratch.qmd
+          - text: "PCA & Box-Cox"
+            href: pca-boxcox-from-scratch.qmd
       - section: "Trees"
         contents:
-          - cart-from-scratch.qmd
-      - section: "Practice"
-        contents:
-          - comprehensive-quiz.qmd
-          - binary-choice-drill.qmd
-          - confusion-matrix-drill.qmd
+          - text: "CART"
+            href: cart-from-scratch.qmd
       - section: "Variable Selection"
         contents:
-          - variable-selection-from-scratch.qmd
+          - text: "Variable Selection"
+            href: variable-selection-from-scratch.qmd
       - section: "Design of Experiments"
         contents:
-          - doe-from-scratch.qmd
+          - text: "DOE"
+            href: doe-from-scratch.qmd
       - section: "Simulation & Markov"
         contents:
-          - simulation-markov-from-scratch.qmd
+          - text: "Simulation & Markov"
+            href: simulation-markov-from-scratch.qmd
       - section: "Missing Data"
         contents:
-          - missing-data-from-scratch.qmd
+          - text: "Missing Data"
+            href: missing-data-from-scratch.qmd
       - section: "Optimization"
         contents:
-          - optimization-from-scratch.qmd
+          - text: "Optimization"
+            href: optimization-from-scratch.qmd
       - section: "Advanced Topics"
         contents:
-          - advanced-topics-from-scratch.qmd
+          - text: "Advanced Topics"
+            href: advanced-topics-from-scratch.qmd
+      - section: "Practice"
+        contents:
+          - text: "Comprehensive Quiz"
+            href: comprehensive-quiz.qmd
+          - text: "Binary Choice Drill"
+            href: binary-choice-drill.qmd
+          - text: "Confusion Matrix Drill"
+            href: confusion-matrix-drill.qmd
   page-footer:
     center: "Independent educational resource. Content is CC BY-NC 4.0; code is MIT licensed."
 
@@ -71,8 +98,10 @@ format:
     toc-depth: 3
     code-fold: false
     theme: cosmo
-    css: styles.css
+    css:
+      - styles.css
+      - responsive-nav.css
     grid:
-      body-width: 900px
-      sidebar-width: 350px
-      margin-width: 350px
+      body-width: 960px
+      sidebar-width: 310px
+      margin-width: 280px
