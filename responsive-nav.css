@@ -29,6 +29,10 @@
     margin-right: auto !important;
   }
 
+  .navbar .quarto-navbar-tools.tools-end {
+    display: none !important;
+  }
+
   .navbar .navbar-brand,
   .navbar .navbar-title {
     max-width: calc(100vw - 8rem) !important;

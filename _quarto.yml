@@ -15,6 +15,10 @@ website:
   navbar:
     title: "Analytics Modeling"
     pinned: true
+    tools:
+      - icon: house-door
+        href: index.qmd
+        aria-label: "Home"
   sidebar:
     style: docked
     title: "Demo Library"
