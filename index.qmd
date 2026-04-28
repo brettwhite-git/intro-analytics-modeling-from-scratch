@@ -11,26 +11,57 @@ Every walkthrough builds a modeling idea from the ground up. You see the
 question the method answers, the formula it relies on, the R code that makes it
 concrete, and the judgment calls that matter when the math meets messy data.
 
-::: {.home-actions}
-[Start with a goal](#choose-by-goal){.action-button .primary}
-[Practice drills](#featured-practice){.action-button}
-[Core demos](#topic-map){.action-button}
+## Get Started
+
+Choose the path that matches how you want to learn today.
+
+::: {.path-grid}
+::: {.path-card}
+[**Goals**](#choose-by-goal)
+
+Start from the modeling job: classify, forecast, optimize, transform, or validate.
 :::
 
-::: {.home-snapshot}
-::: {.snapshot-item}
-**18**
-walkthroughs and drills
+::: {.path-card}
+[**Topics**](#topic-map)
+
+Jump directly to a formula-first walkthrough for a specific method.
 :::
 
-::: {.snapshot-item}
-**R-first**
-worked examples
+::: {.path-card}
+[**Practice**](#featured-practice)
+
+Use focused drills to check recall, costs, and decision logic.
+:::
 :::
 
-::: {.snapshot-item}
-**Formula + code**
-side by side
+## The Modeling Loop
+
+Each page follows the same rhythm so you can move from intuition to implementation without losing the thread.
+
+::: {.modeling-loop}
+::: {.loop-step}
+**Question**
+
+What job is the method trying to do?
+:::
+
+::: {.loop-step}
+**Formula**
+
+Which mathematical object carries the idea?
+:::
+
+::: {.loop-step}
+**Code**
+
+How does the formula become executable R?
+:::
+
+::: {.loop-step}
+**Judgment**
+
+Where can the model mislead you?
 :::
 :::
 

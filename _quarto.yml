@@ -11,14 +11,26 @@ website:
   repo-url: "https://github.com/brettwhite-git/intro-analytics-modeling-from-scratch"
   search:
     location: navbar
-    type: textbox
+    type: overlay
+    keyboard-shortcut: ["k"]
+    limit: 50
+    collapse-after: 3
+    copy-button: false
+    show-item-context: tree
   navbar:
     title: "Analytics Modeling"
     pinned: true
+    left:
+      - text: "Goals"
+        href: index.qmd#choose-by-goal
+      - text: "Topics"
+        href: index.qmd#topic-map
+      - text: "Practice"
+        href: index.qmd#featured-practice
     tools:
-      - icon: house-door
-        href: index.qmd
-        aria-label: "Home"
+      - icon: github
+        href: "https://github.com/brettwhite-git/intro-analytics-modeling-from-scratch"
+        aria-label: "GitHub"
   sidebar:
     style: docked
     title: "Demo Library"
@@ -101,11 +113,16 @@ format:
     toc: true
     toc-depth: 3
     code-fold: false
-    theme: cosmo
+    theme:
+      light: cosmo
+      dark: darkly
     css:
       - styles.css
       - responsive-nav.css
     grid:
       body-width: 960px
-      sidebar-width: 310px
-      margin-width: 280px
+      sidebar-width: 280px
+      margin-width: 300px
+
+language:
+  search-text-placeholder: "Search"
