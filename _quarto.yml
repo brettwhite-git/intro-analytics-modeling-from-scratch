@@ -7,8 +7,8 @@ project:
 website:
   title: "Analytics Modeling From Scratch"
   description: "Step-by-step analytics modeling walkthroughs for learners who want the formulas, code, and intuition together."
-  site-url: "https://brettwhite-git.github.io/intro-analytics-modeling-from-scratch/"
-  repo-url: "https://github.com/brettwhite-git/intro-analytics-modeling-from-scratch"
+  site-url: "https://brettwhite-git.github.io/analytics-modeling/"
+  repo-url: "https://github.com/brettwhite-git/analytics-modeling"
   search:
     location: navbar
     type: overlay
@@ -29,7 +29,7 @@ website:
         href: index.qmd#featured-practice
     tools:
       - icon: github
-        href: "https://github.com/brettwhite-git/intro-analytics-modeling-from-scratch"
+        href: "https://github.com/brettwhite-git/analytics-modeling"
         aria-label: "GitHub"
   sidebar:
     style: docked

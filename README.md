@@ -54,7 +54,7 @@ as the source.
 Expected project-site URL:
 
 ```text
-https://<github-user>.github.io/intro-analytics-modeling-from-scratch/
+https://<github-user>.github.io/analytics-modeling/
 ```
 
 ## Repository Layout
